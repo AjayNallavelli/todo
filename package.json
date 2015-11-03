@@ -2,7 +2,9 @@
   "name": "xlist",
   "version": "0.0.0",
   "private": true,
-  "dependencies": {},
+  "dependencies": {
+    "cordova-plugin-background-geolocation": "^1.0.6"
+  },
   "devDependencies": {
     "grunt-steroids": "1.x"
   }
