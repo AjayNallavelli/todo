@@ -1,7 +1,7 @@
 angular
   .module('xlist')
-  .controller('HomeController', function($scope, supersonic) {
-
+  .controller('HomeController',
+      ['$scope', 'supersonic', 'slackbot', function($scope, supersonic) {
     $scope.withinDistance = false;
     $scope.wholefoods = {latitude: '', longitude: '', timestamp: ''};
     $scope.wholefoods.latitude = 42.046858;
@@ -18,8 +18,12 @@ angular
         if ((Math.abs($scope.wholefoods.latitude - $scope.mylocation.latitude) < 1) && (Math.abs($scope.wholefoods.longitude - $scope.mylocation.longitude) < 1)) {
           $scope.withinDistance = true;
         }
-      }, 1000);
+      }, 60 * 1000);
     };
     getDistance();
 
-  });
+    window.setInterval(function() {
+      slackbot('hello');
+    }, 10 * 1000);
+
+  }]);
