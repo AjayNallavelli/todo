@@ -2,9 +2,18 @@ angular
   .module('xlist')
   .controller('HomeController',
       ['$scope', 'supersonic', 'slackbot', function($scope, supersonic) {
-    $scope.wholefoods = {latitude: '', longitude: '', timestamp: ''};
+    $scope.wholefoods = {latitude: '', longitude: ''};
     $scope.wholefoods.latitude = 42.046858;
     $scope.wholefoods.longitude = -87.679596;
+    $scope.slivka = {latitude: '', longitude: ''};
+    $scope.slivka.latitude = 42.060487;
+    $scope.slivka.longitude = -87.675712;
+    $scope.ford = {latitude: '', longitude: ''};
+    $scope.ford.latitude = 42.056924;
+    $scope.ford.longitude = -87.676544;
+    $scope.tech = {latitude: '', longitude: ''};
+    $scope.tech.latitude = 42.057488;
+    $scope.tech.longitude = -87.675817;
     $scope.mylocation = {latitude: '', longitude: '', timestamp: ''};
 
     document.addEventListener('deviceready', function () {
@@ -22,14 +31,15 @@ angular
       setInterval(function() {
         getLocation();
         console.log($scope.mylocation);
-        distance = getDistance($scope.mylocation, $scope.wholefoods);
-        if (distance < 1) {
-          console.log('you are near whole foods!')
-        }
-        else {
-          console.log('you are not near whole foods');
-        }
-      }, 10000);
+        distance = getDistance($scope.mylocation, $scope.tech);
+        console.log(distance);
+        // if (distance < 1) {
+        //   console.log('you are near whole foods!')
+        // }
+        // else {
+        //   console.log('you are not near whole foods');
+        // }
+      }, 3000);
 
     }, false);
 
@@ -51,7 +61,8 @@ angular
         Math.sin(dLong / 2) * Math.sin(dLong / 2);
       var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
       var d = R * c; // d = distance in meters
-      return d / 1609; // returns the distance in miles
+      return d; // returns the distance in meters
+      // return d / 1609; // returns the distance in miles
     };
 
     window.setInterval(function() {
