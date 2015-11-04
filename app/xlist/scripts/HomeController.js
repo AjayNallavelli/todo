@@ -33,15 +33,15 @@ angular
         console.log($scope.mylocation);
         distance = getDistance($scope.mylocation, $scope.tech);
         console.log(distance);
-        if (distance < 1000) {
+        if (distance < 60) {
           slackbot('near tech');
         }
         distance = getDistance($scope.mylocation, $scope.ford);
         console.log(distance);
-        if (distance < 1000) {
+        if (distance < 60) {
           slackbot('near ford');
         }
-      }, 10000);
+      }, 30 * 1000);
 
     }, false);
 
