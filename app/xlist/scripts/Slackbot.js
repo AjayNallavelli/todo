@@ -2,7 +2,7 @@ angular
   .module('xlist')
   .factory('slackbot', ['$http', function($http) {
     var deviceReady = false;
-    document.addEventListener('deviceready', function () {
+    document.addEventListener('deviceready', function() {
       deviceReady = true;
     });
     var _whenDeviceReady = function(callback) {
@@ -14,8 +14,9 @@ angular
     };
     return function(message) {
       _whenDeviceReady(function() {
-        formatted = device.uuid + ' says ' + message;
+        var formatted = device.uuid + ' says ' + message;
         supersonic.logger.info(formatted);
+
         $http({
           method: 'POST',
           url: 'https://eecs394-red.slack.com' +
