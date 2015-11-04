@@ -22,8 +22,4 @@ angular
     };
     getDistance();
 
-    window.setInterval(function() {
-      slackbot('hello');
-    }, 10 * 1000);
-
   }]);
