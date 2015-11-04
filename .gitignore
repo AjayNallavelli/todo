@@ -87,11 +87,6 @@ build/Release
 # https://docs.npmjs.com/misc/faq#should-i-check-my-node-modules-folder-into-git
 node_modules
 bower_components
-<<<<<<< HEAD
-.sass-cache/
-logs/
-config/cloud.json
-=======
 
 ### Sublime Text ###
 # Sublime Text Project Files
@@ -100,4 +95,3 @@ config/cloud.json
 # Cloud files
 config/cloud.json
 config/cloud-resources.raml
->>>>>>> master
