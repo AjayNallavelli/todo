@@ -1,7 +1,7 @@
 angular
   .module('xlist')
   .controller('HomeController',
-      ['$scope', 'supersonic', 'slackbot', function($scope, supersonic) {
+      ['$scope', 'supersonic', 'slackbot', function($scope, supersonic, slackbot) {
     $scope.withinDistance = false;
     $scope.wholefoods = {latitude: '', longitude: '', timestamp: ''};
     $scope.wholefoods.latitude = 42.046858;
