@@ -8,22 +8,36 @@ angular
     $scope.wholefoods.longitude = -87.679596;
     $scope.mylocation = {latitude: '', longitude: '', timestamp: ''};
 
-    var getDistance = function() {
-      setInterval(function(){
-        supersonic.device.geolocation.getPosition().then(function(position) {
-          $scope.mylocation.latitude = position.coords.latitude;
-          $scope.mylocation.longitude = position.coords.longitude;
-          $scope.mylocation.timestamp = position.timestamp;
-        });
-        if ((Math.abs($scope.wholefoods.latitude - $scope.mylocation.latitude) < 1) && (Math.abs($scope.wholefoods.longitude - $scope.mylocation.longitude) < 1)) {
-          $scope.withinDistance = true;
-        }
-      }, 60 * 1000);
+    document.addEventListener('deviceready', function () {
+      cordova.plugins.backgroundMode.configure({
+        silent: true
+      })
+      // Enable background mode
+      cordova.plugins.backgroundMode.enable();
+
+      if (cordova.plugins.backgroundMode.isEnabled()) {
+        console.log('background mode enabled');
+      }
+
+      setInterval(function() {
+        getLocation();
+        console.log($scope.mylocation);
+      }, 3000);
+
+    }, false);
+
+    var getLocation = function() {
+      supersonic.device.geolocation.getPosition().then(function(position) {
+        $scope.mylocation.latitude = position.coords.latitude;
+        $scope.mylocation.longitude = position.coords.longitude;
+        $scope.mylocation.timestamp = position.timestamp;
+      });
     };
-    getDistance();
+
 
     window.setInterval(function() {
       slackbot('hello');
     }, 10 * 1000);
 
   }]);
+
