@@ -71,7 +71,7 @@ angular
 
     var findNear = function(location) {
       supersonic.logger.info(JSON.stringify(location));
-      for (preset in presetLocations) {  
+      for (preset in presetLocations) {
         var distance = getDistance(location, presetLocations[preset]);
         console.log(distance);
         if (distance < THRESHOLD) {
