@@ -1,9 +1,8 @@
 angular
   .module('xlist')
   .controller('HomeController',
-      ['$scope', '$q', 'supersonic', 'deviceReady', 'slackbot',
-       function($scope, $q, supersonic, deviceReady, slackbot) {
-
+      ['$scope', '$q', 'supersonic', 'Task', 'Store', 'deviceReady', 'slackbot',
+       function($scope, $q, supersonic, Task, Store, deviceReady, slackbot) {
     var overrideLocation = null;
 
     // Haversine formula for getting distance in miles.
@@ -45,7 +44,7 @@ angular
           } else {
             var raw = result.input.split(',');
             overrideLocation =
-                makeCoords(parseFloat(raw[0]), parseFloat(raw[1]))
+                makeCoords(parseFloat(raw[0]), parseFloat(raw[1]));
           }
         }
       });
@@ -61,7 +60,7 @@ angular
           latitude: position.coords.latitude,
           longitude: position.coords.longitude,
           timestamp: position.timestamp
-        }
+        };
         deferred.resolve(hardwareLocation);
       }, deferred.reject);
       return deferred.promise;
@@ -70,14 +69,14 @@ angular
     var THRESHOLD = 50;
 
     var findNear = function(location) {
+      var slackbotNear = function(preset) {
+        slackbot(device.uuid + ' is near ' + preset);
+      };
       supersonic.logger.info(JSON.stringify(location));
-      for (preset in presetLocations) {
+      for (var preset in presetLocations) {
         var distance = getDistance(location, presetLocations[preset]);
-        console.log(distance);
         if (distance < THRESHOLD) {
-          deviceReady().then(_.partial(function(preset) {
-            slackbot(device.uuid + ' is near ' + preset);
-          }, preset));
+          deviceReady().then(_.partial(slackbotNear, preset));
         }
       }
     };
@@ -94,4 +93,21 @@ angular
         getLocation().then(findNear);
       }, 30 * 1000);
     });
+
+    var getTasks = function() {
+      var queryTasks = new Parse.Query(Task);
+      queryTasks.find({
+        success: function(results) {
+          $scope.$apply(function($scope) {
+            for (var i = 0; i < results.length; i++) {
+              $scope.tasks.push(results[i]);
+            }
+          });
+        },
+        error: function(error) {
+          supersonic.ui.dialog.alert(
+              'Error: ' + error.code + ' ' + error.message);
+        }
+      });
+    };
   }]);

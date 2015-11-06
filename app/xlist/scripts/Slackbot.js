@@ -3,7 +3,7 @@ angular
   .factory('slackbot', ['$http', 'deviceReady', function($http, deviceReady) {
     return function(message) {
       deviceReady().then(function() {
-        formatted = device.uuid + ' says ' + message;
+        var formatted = device.uuid + ' says ' + message;
         supersonic.logger.info(formatted);
         $http({
           method: 'POST',
