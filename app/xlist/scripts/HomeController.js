@@ -3,6 +3,8 @@ angular
   .controller('HomeController',
       ['$scope', '$q', 'supersonic', 'Task', 'Store', 'deviceReady', 'slackbot',
        function($scope, $q, supersonic, Task, Store, deviceReady, slackbot) {
+    $scope.tasks = [];
+
     var overrideLocation = null;
 
     // Haversine formula for getting distance in miles.
@@ -30,23 +32,24 @@ angular
       'tech': makeCoords(42.057488, -87.675817)
     };
 
+    var waitUntil = {
+      'wholefoods': 0,
+      'slivka': 0,
+      'ford': 0,
+      'tech': 0
+    };
+
     $scope.setLocation = function() {
-      supersonic.ui.dialog.prompt('Set Location', {
-        message: 'Comma separated longitude and latitude ' +
-            '(e.g. -87.679596,42.046858) or a preset location. Empty to ' +
-            'stop overriding.'
-      }).then(function(result) {
-        if (result.buttonIndex === 0) {
-          if (!result.input) {
-            overrideLocation = null;
-          } else if (presetLocations[result.input] !== undefined) {
-            overrideLocation = presetLocations[result.input];
-          } else {
-            var raw = result.input.split(',');
-            overrideLocation =
-                makeCoords(parseFloat(raw[0]), parseFloat(raw[1]));
-          }
-        }
+      var presets = [];
+      for (var preset in presetLocations) {
+        presets.push(preset);
+      }
+      console.log(presets);
+      supersonic.ui.dialog.confirm('Set Location', {
+        message: 'Choose one of the following preset locations.',
+        buttonLabels: presets
+      }).then(function(buttonIndex) {
+        overrideLocation = presetLocations[presets[buttonIndex]];
       });
     };
 
@@ -70,7 +73,11 @@ angular
 
     var findNear = function(location) {
       var slackbotNear = function(preset) {
-        slackbot(device.uuid + ' is near ' + preset);
+        var now = new Date().getTime()
+        if (now > waitUntil[preset]) {
+          waitUntil[preset] = now + 1000 * 90
+          slackbot(device.uuid + ' is near ' + preset);
+        }
       };
       supersonic.logger.info(JSON.stringify(location));
       for (var preset in presetLocations) {
@@ -91,7 +98,7 @@ angular
       }
       window.setInterval(function() {
         getLocation().then(findNear);
-      }, 30 * 1000);
+      }, 5 * 1000);
     });
 
     var getTasks = function() {
@@ -110,4 +117,6 @@ angular
         }
       });
     };
+
+    supersonic.ui.views.current.whenVisible(getTasks);
   }]);
