@@ -1,64 +1,97 @@
 angular
   .module('xlist')
   .controller('HomeController',
-      ['$scope', 'supersonic', 'slackbot',
-      function($scope, supersonic, slackbot) {
-    $scope.wholefoods = {latitude: 42.046858, longitude: -87.679596};
-    $scope.slivka = {latitude: 42.060487, longitude: -87.675712};
-    $scope.ford = {latitude: 42.056924, longitude: -87.676544};
-    $scope.tech = {latitude: 42.057488, longitude: -87.675817};
-    $scope.mylocation = {latitude: '', longitude: '', timestamp: ''};
+      ['$scope', '$q', 'supersonic', 'deviceReady', 'slackbot',
+       function($scope, $q, supersonic, deviceReady, slackbot) {
 
-    document.addEventListener('deviceready', function() {
+    var overrideLocation = null;
+
+    // Haversine formula for getting distance in miles.
+    var getDistance = function(p1, p2) {
+      var R = 6378137; // Earth’s mean radius in meter
+      var degToRad = Math.PI / 180; // Degree to radian conversion.
+      var dLat = (p2.latitude - p1.latitude) * degToRad;
+      var dLong = (p2.longitude - p1.longitude) * degToRad;
+      var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+          Math.cos(p1.latitude * degToRad) * Math.cos(p2.latitude * degToRad) *
+          Math.sin(dLong / 2) * Math.sin(dLong / 2);
+      var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      var d = R * c; // d = distance in meters
+      return d; // Returns the distance in meters.
+    };
+
+    var makeCoords = function(latitude, longitude) {
+      return {latitude: latitude, longitude: longitude};
+    };
+
+    var presetLocations = {
+      'wholefoods': makeCoords(42.046858, -87.679596),
+      'slivka': makeCoords(42.060487, -87.675712),
+      'ford': makeCoords(42.056924, -87.676544),
+      'tech': makeCoords(42.057488, -87.675817)
+    };
+
+    $scope.setLocation = function() {
+      supersonic.ui.dialog.prompt('Set Location', {
+        message: 'Comma separated longitude and latitude ' +
+            '(e.g. -87.679596,42.046858) or a preset location. Empty to ' +
+            'stop overriding.'
+      }).then(function(result) {
+        if (result.buttonIndex === 0) {
+          if (!result.input) {
+            overrideLocation = null;
+          } else if (presetLocations[result.input] !== undefined) {
+            overrideLocation = presetLocations[result.input];
+          } else {
+            var raw = result.input.split(',');
+            overrideLocation =
+                makeCoords(parseFloat(raw[0]), parseFloat(raw[1]))
+          }
+        }
+      });
+    };
+
+    var getLocation = function() {
+      var deferred = $q.defer();
+      if (overrideLocation) {
+        deferred.resolve(overrideLocation);
+      }
+      supersonic.device.geolocation.getPosition().then(function(position) {
+        var hardwareLocation = {
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+          timestamp: position.timestamp
+        }
+        deferred.resolve(hardwareLocation);
+      }, deferred.reject);
+      return deferred.promise;
+    };
+
+    var THRESHOLD = 50;
+
+    var findNear = function(location) {
+      supersonic.logger.info(JSON.stringify(location));
+      for (preset in presetLocations) {  
+        var distance = getDistance(location, presetLocations[preset]);
+        console.log(distance);
+        if (distance < THRESHOLD) {
+          deviceReady().then(_.partial(function(preset) {
+            slackbot(device.uuid + ' is near ' + preset);
+          }, preset));
+        }
+      }
+    };
+
+    deviceReady().then(function() {
       cordova.plugins.backgroundMode.configure({
         silent: true
       });
-      // Enable background mode
       cordova.plugins.backgroundMode.enable();
-
-      if (cordova.plugins.backgroundMode.isEnabled()) {
-        console.log('background mode enabled');
+      if (!cordova.plugins.backgroundMode.isEnabled()) {
+        supersonic.ui.dialog.alert('Failed to enable background mode.');
       }
-
-      var distance = 0;
-      setInterval(function() {
-        getLocation();
-        console.log($scope.mylocation);
-        distance = getDistance($scope.mylocation, $scope.tech);
-        console.log(distance);
-        if (distance < 60) {
-          slackbot('near tech');
-        }
-        distance = getDistance($scope.mylocation, $scope.ford);
-        console.log(distance);
-        if (distance < 60) {
-          slackbot('near ford');
-        }
+      window.setInterval(function() {
+        getLocation().then(findNear);
       }, 30 * 1000);
-
-    }, false);
-
-    var getLocation = function() {
-      supersonic.device.geolocation.getPosition().then(function(position) {
-        $scope.mylocation.latitude = position.coords.latitude;
-        $scope.mylocation.longitude = position.coords.longitude;
-        $scope.mylocation.timestamp = position.timestamp;
-      });
-    };
-
-    // Haversine formula for getting distance in miles
-    var getDistance = function(p1, p2) {
-      var R = 6378137; // Earth’s mean radius in meter
-      var degToRad = Math.PI / 180; // degree to radian conversion
-      var dLat = (p2.latitude - p1.latitude) * degToRad;
-      var dLong = (p2.longitude - p1.longitude) * degToRad;
-
-      var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-        Math.cos(p1.latitude * degToRad) * Math.cos(p2.latitude * degToRad) *
-        Math.sin(dLong / 2) * Math.sin(dLong / 2);
-      var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-      var d = R * c; // d = distance in meters
-      return d; // returns the distance in meters
-      // return d / 1609; // returns the distance in miles
-    };
+    });
   }]);

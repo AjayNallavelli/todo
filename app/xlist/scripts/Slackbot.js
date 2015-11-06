@@ -1,19 +1,8 @@
 angular
   .module('xlist')
-  .factory('slackbot', ['$http', function($http) {
-    var deviceReady = false;
-    document.addEventListener('deviceready', function () {
-      deviceReady = true;
-    });
-    var _whenDeviceReady = function(callback) {
-      if (deviceReady) {
-        callback();
-      } else {
-        document.addEventListener('deviceready', callback);
-      }
-    };
+  .factory('slackbot', ['$http', 'deviceReady', function($http, deviceReady) {
     return function(message) {
-      _whenDeviceReady(function() {
+      deviceReady().then(function() {
         formatted = device.uuid + ' says ' + message;
         supersonic.logger.info(formatted);
         $http({
