@@ -32,6 +32,13 @@ angular
       'tech': makeCoords(42.057488, -87.675817)
     };
 
+    var presetTasks = {
+      'wholefoods': 'Buy milk.',
+      'slivka': 'Do laundry.',
+      'ford': 'Return the hot glue gun.',
+      'tech': 'Turn in homework.'
+    };
+
     var waitUntil = {
       'wholefoods': 0,
       'slivka': 0,
@@ -76,7 +83,7 @@ angular
         var now = new Date().getTime()
         if (now > waitUntil[preset]) {
           waitUntil[preset] = now + 1000 * 90
-          slackbot(device.uuid + ' is near ' + preset);
+          slackbot('You are near ' + preset + '. ' + presetTasks[preset]);
         }
       };
       supersonic.logger.info(JSON.stringify(location));
