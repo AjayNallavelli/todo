@@ -1,26 +1,14 @@
 <div ng-controller="HomeController">
   <super-navbar>
-    <super-navbar-title ng-bind="navbarTitle">ToDo</super-navbar-title>
+    <super-navbar-title>ToDo</super-navbar-title>
   </super-navbar>
 
   <ul class="list">
-    <li class="item item-checkbox">
+    <li class="item item-checkbox" ng-repeat="task in tasks">
        <label class="checkbox">
          <input type="checkbox">
        </label>
-       Buy eggs at Whole Foods.
-    </li>
-    <li class="item item-checkbox">
-       <label class="checkbox">
-         <input type="checkbox">
-       </label>
-       Return book to Evanston Public Library.
-    </li>
-    <li class="item item-checkbox">
-       <label class="checkbox">
-         <input type="checkbox">
-       </label>
-       Pick up dry cleaning.
+       {{ task.get('name') }}
     </li>
   </ul>
 </div>

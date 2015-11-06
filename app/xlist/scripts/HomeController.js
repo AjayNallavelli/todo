@@ -1,7 +1,8 @@
 angular
   .module('xlist')
   .controller('HomeController',
-      ['$scope', 'supersonic', 'slackbot', function($scope, supersonic, slackbot) {
+      ['$scope', 'supersonic', 'Task', 'Store', 'slackbot', 
+      function($scope, supersonic, Task, Store, slackbot) {
     $scope.wholefoods = {latitude: '', longitude: ''};
     $scope.wholefoods.latitude = 42.046858;
     $scope.wholefoods.longitude = -87.679596;
@@ -15,6 +16,7 @@ angular
     $scope.tech.latitude = 42.057488;
     $scope.tech.longitude = -87.675817;
     $scope.mylocation = {latitude: '', longitude: '', timestamp: ''};
+    $scope.tasks = [];
 
     document.addEventListener('deviceready', function () {
       cordova.plugins.backgroundMode.configure({
@@ -26,6 +28,8 @@ angular
       if (cordova.plugins.backgroundMode.isEnabled()) {
         console.log('background mode enabled');
       }
+
+      supersonic.ui.views.current.whenVisible(getTasks);
 
       var distance = 0;
       setInterval(function() {
@@ -41,7 +45,7 @@ angular
         if (distance < 60) {
           slackbot('near ford');
         }
-      }, 10000);
+      }, 100000);
 
     }, false);
 
@@ -65,5 +69,22 @@ angular
       var d = R * c; // d = distance in meters
       return d; // returns the distance in meters
       // return d / 1609; // returns the distance in miles
+    };
+
+    var getTasks = function() {
+      var Task = Parse.Object.extend('Task');
+      var querytasks = new Parse.Query(Task);
+      querytasks.find({
+        success: function (results) {
+          $scope.$apply(function($scope) {
+            for (var i = 0; i < results.length; i++) {
+              $scope.tasks.push(results[i]);
+            }
+          });
+        },
+        error: function (error) {
+          alert("Error: " + error.code + " " + error.message);
+        }
+      });
     };
   }]);
