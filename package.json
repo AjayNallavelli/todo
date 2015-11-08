@@ -2,9 +2,7 @@
   "name": "myProject",
   "version": "0.0.0",
   "private": true,
-  "dependencies": {
-    "cordova-plugin-background-geolocation": "^1.0.6"
-  },
+  "dependencies": {},
   "devDependencies": {
     "glob": "^5.0.15",
     "grunt": "0.4.5",

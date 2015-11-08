@@ -1,12 +1,15 @@
-<div class="padding" ng-controller="HomeController">
+<div ng-controller="HomeController">
   <super-navbar>
-    <super-navbar-title ng-bind="navbarTitle"></super-navbar-title>
+    <super-navbar-title>ToDo</super-navbar-title>
+    <super-navbar-button ng-click="setLocation()">Set Location</super-navbar-button>
   </super-navbar>
 
-  <h3>Hello</h3>
-  <h2 ng-show="withinDistance">You are near whole foods!</h2>
-  <h3>{{ mylocation.latitude }}</h3>
-  <h3>{{ mylocation.longitude }}</h3>
-  <h3>{{ mylocation.timestamp }}</h3>
-
+  <ul class="list">
+    <li class="item item-checkbox" ng-repeat="task in tasks">
+       <label class="checkbox">
+         <input type="checkbox">
+       </label>
+       {{ task.get('name') }}
+    </li>
+  </ul>
 </div>

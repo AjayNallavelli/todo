@@ -10,6 +10,7 @@
     "supersonic": true,
     "_": true,
     "Parse": true,
-    "device": true
+    "device": true,
+    "cordova": true
   }
 }
