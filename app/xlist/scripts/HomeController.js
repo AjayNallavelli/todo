@@ -2,7 +2,9 @@ angular
   .module('xlist')
   .controller('HomeController',
       ['$scope', '$q', 'supersonic', 'Task', 'Store', 'deviceReady', 'slackbot',
-       function($scope, $q, supersonic, Task, Store, deviceReady, slackbot) {
+       'push',
+       function($scope, $q, supersonic, Task, Store, deviceReady, slackbot,
+                push) {
     $scope.tasks = [];
 
     var overrideLocation = null;
@@ -124,6 +126,17 @@ angular
         }
       });
     };
+
+    $scope.testPN = function() {
+      push.send({message: 'Hello World!'});
+    };
+
+    supersonic.device.push.foregroundNotifications().onValue(
+        function(notification) {
+          supersonic.ui.dialog.alert('Push Notification', {
+            message: JSON.stringify(notification)
+          });
+        });
 
     supersonic.ui.views.current.whenVisible(getTasks);
   }]);

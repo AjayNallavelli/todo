@@ -1,0 +1,10 @@
+{
+  "applications": {
+    "_default": {
+      "link": "xlist"
+    },
+    "xlist": {
+      "applicationId": "VDhhLoxsxxX6XIxMfTr66guz1bzzZ3kr9p40wxbI"
+    }
+  }
+}
