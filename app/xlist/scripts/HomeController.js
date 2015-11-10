@@ -20,7 +20,7 @@ angular
       var d = R * c; // d = distance in meters
       return d; // Returns the distance in meters.
     };
-
+ 
     var makeCoords = function(latitude, longitude) {
       return {latitude: latitude, longitude: longitude};
     };
