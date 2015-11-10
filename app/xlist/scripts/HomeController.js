@@ -136,5 +136,25 @@ angular
     //       });
     //     });
 
+    $scope.congratsAlert = function(task) {
+      task.save({
+        done: !task.get('done')
+      }, {
+        success: function(results) {
+          if (task.get('done')) {
+            var options = {
+              message: 'You finished a task!',
+              buttonLabel: 'Close'
+            };
+            supersonic.ui.dialog.alert('Congratulations!', options);
+          }
+        },
+        error: function(error) {
+          supersonic.ui.dialog.alert(
+              'Error: ' + error.code + ' ' + error.message);
+        }
+      });
+    };
+
     supersonic.ui.views.current.whenVisible(getTasks);
   }]);
