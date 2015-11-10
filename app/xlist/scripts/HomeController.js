@@ -80,9 +80,9 @@ angular
 
     var findNear = function(location) {
       var slackbotNear = function(preset) {
-        var now = new Date().getTime()
+        var now = new Date().getTime();
         if (now > waitUntil[preset]) {
-          waitUntil[preset] = now + 1000 * 90
+          waitUntil[preset] = now + 1000 * 90;
           slackbot('You are near ' + preset + '. ' + presetTasks[preset]);
         }
       };
@@ -117,6 +117,26 @@ angular
               $scope.tasks.push(results[i]);
             }
           });
+        },
+        error: function(error) {
+          supersonic.ui.dialog.alert(
+              'Error: ' + error.code + ' ' + error.message);
+        }
+      });
+    };
+
+    $scope.congratsAlert = function(task) {
+      task.save({
+        done: !task.attributes.done
+      }, {
+        success: function(results) {
+          if (task.attributes.done) {
+            var options = {
+              message: 'You finished a task!',
+              buttonLabel: 'Close'
+            };
+            supersonic.ui.dialog.alert('Congratulations!', options);
+          };
         },
         error: function(error) {
           supersonic.ui.dialog.alert(
