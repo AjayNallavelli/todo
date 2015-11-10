@@ -1,7 +1,8 @@
 angular
   .module('xlist')
   .factory('push',
-      ['$http', '$q', 'deviceReady', function($http, $q, deviceReady) {
+      ['$http', '$q', 'supersonic', 'deviceReady',
+       function($http, $q, supersonic, deviceReady) {
     var registrationID = null;
     var afterRegistration = function() {
       var deferred = $q.defer();
@@ -9,22 +10,28 @@ angular
         deferred.resolve(registrationID);
       } else {
         deviceReady().then(function() {
-          supersonic.device.push.register({
-            senderID: '1042561844220'
-          }).then(function(newRegistrationID) {
-            registrationID = newRegistrationID;
-            deferred.resolve(registrationID);
-          }, deferred.reject);
-        }, deferred.reject);
+          window.plugins.pushNotification.register(
+              function(newRegistrationID) {
+                supersonic.logger.info(newRegistrationID);
+                registrationID = newRegistrationID;
+                deferred.resolve(registrationID);
+              }, deferred.reject, {
+                senderID: '1042561844220'
+              });
+        });
       }
       return deferred.promise;
     };
-    return {
-      send: function(data) {
-        afterRegistration().then(function(registrationID) {
-          Parse.Cloud.run('sendPN', {data: data, to: registrationID}).then(
-              supersonic.logger.info, supersonic.logger.err);
-        });
-      }
+    var push = {};
+    push.send = function(data) {
+      afterRegistration().then(function(registrationID) {
+        var options = {
+          to: registrationID,
+          data: data
+        };
+        Parse.Cloud.run('sendPN', options).then(
+            supersonic.logger.info, supersonic.logger.err);
+      });
     };
+    return push;
   }]);

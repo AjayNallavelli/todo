@@ -3,8 +3,7 @@ angular
   .controller('HomeController',
       ['$scope', '$q', 'supersonic', 'Task', 'Store', 'deviceReady', 'slackbot',
        'push',
-       function($scope, $q, supersonic, Task, Store, deviceReady, slackbot,
-                push) {
+  function($scope, $q, supersonic, Task, Store, deviceReady, slackbot, push) {
     $scope.tasks = [];
 
     var overrideLocation = null;
@@ -82,13 +81,16 @@ angular
 
     var findNear = function(location) {
       var slackbotNear = function(preset) {
-        var now = new Date().getTime()
+        var now = new Date().getTime();
         if (now > waitUntil[preset]) {
-          waitUntil[preset] = now + 1000 * 90
+          waitUntil[preset] = now + 1000 * 90;
+          push.send({
+            title: 'You are near ' + preset + '.',
+            message: presetTasks[preset]
+          });
           slackbot('You are near ' + preset + '. ' + presetTasks[preset]);
         }
       };
-      supersonic.logger.info(JSON.stringify(location));
       for (var preset in presetLocations) {
         var distance = getDistance(location, presetLocations[preset]);
         if (distance < THRESHOLD) {
@@ -107,7 +109,7 @@ angular
       }
       window.setInterval(function() {
         getLocation().then(findNear);
-      }, 5 * 1000);
+      }, 10 * 1000);
     });
 
     var getTasks = function() {
@@ -127,16 +129,12 @@ angular
       });
     };
 
-    $scope.testPN = function() {
-      push.send({message: 'Hello World!'});
-    };
-
-    supersonic.device.push.foregroundNotifications().onValue(
-        function(notification) {
-          supersonic.ui.dialog.alert('Push Notification', {
-            message: JSON.stringify(notification)
-          });
-        });
+    // supersonic.device.push.foregroundNotifications().onValue(
+    //     function(notification) {
+    //       supersonic.ui.dialog.alert('Push Notification', {
+    //         message: JSON.stringify(notification)
+    //       });
+    //     });
 
     supersonic.ui.views.current.whenVisible(getTasks);
   }]);
