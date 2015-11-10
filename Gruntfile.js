@@ -1,14 +1,6 @@
-/*
-
-Default Gruntfile for AppGyver Steroids
-http://www.appgyver.com
-Licensed under the MIT license.
-
-*/
-
 module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-jscs');
-  grunt.loadNpmTasks('grunt-contrib-jshint')
+  grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-steroids');
   grunt.registerTask('default', [
     'jshint',
@@ -23,14 +15,24 @@ module.exports = function(grunt) {
         force: true,
         verbose: true
       },
-      src: ['app/xlist/**/*.js']
+      src: [
+        'app/xlist/**/*.js',
+        'scripts/**/*.js',
+        'parse/**/*.js',
+        'Gruntfile.js',
+      ]
     },
     jshint: {
       options: {
         force: true,
         jshintrc: '.jshintrc'
       },
-      src: ['app/xlist/**/*.js']
+      src: [
+        'app/xlist/**/*.js',
+        'scripts/**/*.js',
+        'parse/**/*.js',
+        'Gruntfile.js',
+      ]
     },
   });
-}
+};
