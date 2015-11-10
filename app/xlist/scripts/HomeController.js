@@ -135,6 +135,15 @@ angular
     //         message: JSON.stringify(notification)
     //       });
     //     });
+    $scope.addGroceryList = function() {
+      $scope.ingredients.push({'name': '', 'quantity': ''});
+    };
+    $scope.deleteGroceryList = function() {
+      // $scope.ingredients.push({'name': '', 'quantity': ''});
+    };
+    $scope.saveGroceryList = function() {
+      // $scope.ingredients.push({'name': '', 'quantity': ''});
+    };
 
     $scope.congratsAlert = function(task) {
       task.save({
@@ -156,6 +165,5 @@ angular
       });
     };
 
->>>>>>> 3df5cd3092a54de87989e326e8f204513c1b86f8
     supersonic.ui.views.current.whenVisible(getTasks);
   }]);
