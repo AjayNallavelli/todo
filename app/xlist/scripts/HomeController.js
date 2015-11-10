@@ -2,7 +2,8 @@ angular
   .module('xlist')
   .controller('HomeController',
       ['$scope', '$q', 'supersonic', 'Task', 'Store', 'deviceReady', 'slackbot',
-       function($scope, $q, supersonic, Task, Store, deviceReady, slackbot) {
+       'push',
+  function($scope, $q, supersonic, Task, Store, deviceReady, slackbot, push) {
     $scope.tasks = [];
 
     var overrideLocation = null;
@@ -83,10 +84,13 @@ angular
         var now = new Date().getTime();
         if (now > waitUntil[preset]) {
           waitUntil[preset] = now + 1000 * 90;
+          push.send({
+            title: 'You are near ' + preset + '.',
+            message: presetTasks[preset]
+          });
           slackbot('You are near ' + preset + '. ' + presetTasks[preset]);
         }
       };
-      supersonic.logger.info(JSON.stringify(location));
       for (var preset in presetLocations) {
         var distance = getDistance(location, presetLocations[preset]);
         if (distance < THRESHOLD) {
@@ -105,7 +109,7 @@ angular
       }
       window.setInterval(function() {
         getLocation().then(findNear);
-      }, 5 * 1000);
+      }, 10 * 1000);
     });
 
     var getTasks = function() {
@@ -124,6 +128,13 @@ angular
         }
       });
     };
+
+    // supersonic.device.push.foregroundNotifications().onValue(
+    //     function(notification) {
+    //       supersonic.ui.dialog.alert('Push Notification', {
+    //         message: JSON.stringify(notification)
+    //       });
+    //     });
 
     $scope.congratsAlert = function(task) {
       task.save({

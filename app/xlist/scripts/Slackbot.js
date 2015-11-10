@@ -3,14 +3,15 @@ angular
   .factory('slackbot', ['$http', 'deviceReady', function($http, deviceReady) {
     return function(message) {
       deviceReady().then(function() {
-        supersonic.logger.info(device.uuid + ' says ' + message);
+        var formatted = message + ' [' + device.uuid + ']';
+        supersonic.logger.info(formatted);
         $http({
           method: 'POST',
           url: 'https://eecs394-red.slack.com' +
             '/services/hooks/slackbot?' +
             'token=yreGTkXgQas0VgnmG6KZCMUb&' +
             'channel=%23debug',
-          data: message,
+          data: formatted,
           headers: {
             'Content-Type': 'text/plain'
           }
