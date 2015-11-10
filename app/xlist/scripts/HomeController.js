@@ -136,7 +136,7 @@ angular
               buttonLabel: 'Close'
             };
             supersonic.ui.dialog.alert('Congratulations!', options);
-          };
+          }
         },
         error: function(error) {
           supersonic.ui.dialog.alert(
