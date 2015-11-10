@@ -127,10 +127,10 @@ angular
 
     $scope.congratsAlert = function(task) {
       task.save({
-        done: !task.attributes.done
+        done: !task.get('done')
       }, {
         success: function(results) {
-          if (task.attributes.done) {
+          if (task.get('done')) {
             var options = {
               message: 'You finished a task!',
               buttonLabel: 'Close'
