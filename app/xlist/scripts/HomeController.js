@@ -125,5 +125,18 @@ angular
       });
     };
 
+    $scope.addGroceryList = function() {
+      $scope.tasks.push({'name': ''});
+    };
+
+    $scope.deleteGroceryList = function() {
+      // $scope.tasks.push({'name': ''});
+    };
+
+    $scope.saveGroceryList = function() {
+      // $scope.tasks.push({'name': ''});
+    };
+
+
     supersonic.ui.views.current.whenVisible(getTasks);
   }]);
