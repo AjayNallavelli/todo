@@ -3,20 +3,15 @@
     <super-navbar-title>ToDo</super-navbar-title>
     <super-navbar-button ng-click="setLocation()">Set Location</super-navbar-button>
   </super-navbar>
-
   <ul class="list">
     <li class="item item-checkbox" ng-repeat="task in tasks">
        <label class="checkbox">
-         <input type="checkbox">
+         <input type="checkbox" ng-click="congratsAlert(task)" ng-if="task.get('done')" checked>
+         <input type="checkbox" ng-click="congratsAlert(task)" ng-if="!task.get('done')">
        </label>
        {{ task.get('name') }}
     </li>
-    <button class="button button-block button-positive" ng-click="addGroceryList()">
-          Add Grocery
-    </button>
-    <button class="button button-block button-balanced" ng-click="saveGroceryList()">
-          Save
-    </button>
 
   </ul>
+
 </div>

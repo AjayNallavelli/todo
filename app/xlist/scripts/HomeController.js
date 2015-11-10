@@ -2,7 +2,8 @@ angular
   .module('xlist')
   .controller('HomeController',
       ['$scope', '$q', 'supersonic', 'Task', 'Store', 'deviceReady', 'slackbot',
-       function($scope, $q, supersonic, Task, Store, deviceReady, slackbot) {
+       'push',
+  function($scope, $q, supersonic, Task, Store, deviceReady, slackbot, push) {
     $scope.tasks = [];
 
     var overrideLocation = null;
@@ -80,13 +81,16 @@ angular
 
     var findNear = function(location) {
       var slackbotNear = function(preset) {
-        var now = new Date().getTime()
+        var now = new Date().getTime();
         if (now > waitUntil[preset]) {
-          waitUntil[preset] = now + 1000 * 90
+          waitUntil[preset] = now + 1000 * 90;
+          push.send({
+            title: 'You are near ' + preset + '.',
+            message: presetTasks[preset]
+          });
           slackbot('You are near ' + preset + '. ' + presetTasks[preset]);
         }
       };
-      supersonic.logger.info(JSON.stringify(location));
       for (var preset in presetLocations) {
         var distance = getDistance(location, presetLocations[preset]);
         if (distance < THRESHOLD) {
@@ -105,7 +109,7 @@ angular
       }
       window.setInterval(function() {
         getLocation().then(findNear);
-      }, 5 * 1000);
+      }, 10 * 1000);
     });
 
     var getTasks = function() {
@@ -125,18 +129,33 @@ angular
       });
     };
 
-    $scope.addGroceryList = function() {
-      $scope.tasks.push({'name': ''});
+    // supersonic.device.push.foregroundNotifications().onValue(
+    //     function(notification) {
+    //       supersonic.ui.dialog.alert('Push Notification', {
+    //         message: JSON.stringify(notification)
+    //       });
+    //     });
+
+    $scope.congratsAlert = function(task) {
+      task.save({
+        done: !task.get('done')
+      }, {
+        success: function(results) {
+          if (task.get('done')) {
+            var options = {
+              message: 'You finished a task!',
+              buttonLabel: 'Close'
+            };
+            supersonic.ui.dialog.alert('Congratulations!', options);
+          }
+        },
+        error: function(error) {
+          supersonic.ui.dialog.alert(
+              'Error: ' + error.code + ' ' + error.message);
+        }
+      });
     };
 
-    $scope.deleteGroceryList = function() {
-      // $scope.tasks.push({'name': ''});
-    };
-
-    $scope.saveGroceryList = function() {
-      // $scope.tasks.push({'name': ''});
-    };
-
-
+>>>>>>> 3df5cd3092a54de87989e326e8f204513c1b86f8
     supersonic.ui.views.current.whenVisible(getTasks);
   }]);

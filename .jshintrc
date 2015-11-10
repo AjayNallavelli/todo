@@ -11,6 +11,9 @@
     "_": true,
     "Parse": true,
     "device": true,
-    "cordova": true
+    "cordova": true,
+    "module": true,
+    "require": true,
+    "process": true
   }
 }
