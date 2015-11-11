@@ -21,7 +21,7 @@ angular
       var d = R * c; // d = distance in meters
       return d; // Returns the distance in meters.
     };
- 
+
     var makeCoords = function(latitude, longitude) {
       return {latitude: latitude, longitude: longitude};
     };
@@ -136,6 +136,7 @@ angular
     //       });
     //     });
 
+<<<<<<< HEAD
     $scope.addGroceryList = function(task) {
       task.save({
         done: !task('done')
@@ -148,6 +149,10 @@ angular
         }
       })
       $scope.tasks.push({'name': '', 'quantity': ''});
+=======
+    $scope.addGroceryList = function() {
+      $scope.ingredients.push({'name': '', 'quantity': ''});
+>>>>>>> 380f1fca59dbea6e955934ea61a6d18d95052cbc
     };
 
     $scope.deleteGroceryList = function() {
