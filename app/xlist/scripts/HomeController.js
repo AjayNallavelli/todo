@@ -153,11 +153,24 @@ angular
     //     });
 
     $scope.addTask = function() {
-      var newTask = new Task();
-      newTask.set('name', '');
-      newTask.set('done', false);
+      var newParseTask = new Task();
+      newParseTask.set('name', '');
+      newParseTask.set('done', false);
 
-      $scope.tasks.push(newTask);
+      var newJSTask = {
+        name: '',
+        done: false,
+        deadline: undefined,
+        editing: true,
+        edited: {
+          name: '',
+          done: false,
+          deadline: undefined,
+        }
+      };
+
+      $scope.tasks.push(newParseTask);
+      $scope.jsTasks.push(newJSTask);
     };
 
     $scope.deleteTask = function(task) {
