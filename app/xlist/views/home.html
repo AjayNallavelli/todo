@@ -1,4 +1,4 @@
-<div ng-controller="HomeController">
+<!-- <div ng-controller="HomeController">
   <super-navbar>
     <super-navbar-title>ToDo</super-navbar-title>
     <super-navbar-button ng-click="setLocation()">Set Location</super-navbar-button>
@@ -21,6 +21,40 @@
 
         <a class="button button-small button-icon icon super-ios-close" ng-if="!task.get('done')" ng-click="deleteTask(task)"></a>
         <a class="button button-small button-icon icon super-checkmark-circled" ng-if="!task.get('done')"></a>
+      </div>
+
+    </div>
+  </div>
+
+  <button class="button button-block button-positive" ng-click="addTask()">
+          Add Grocery
+  </button>
+</div>
+ -->
+
+ <div ng-controller="HomeController">
+  <super-navbar>
+    <super-navbar-title>ToDo</super-navbar-title>
+    <super-navbar-button ng-click="setLocation()">Set Location</super-navbar-button>
+  </super-navbar>
+
+  <div ng-repeat="task in jsTasks">
+    <div class="item item-input">
+      <div>
+        <a class="button button-icon icon super-ios-circle-outline" ng-click="congratsAlert($index)" ng-if="!task.done"></a>
+        <a class="button button-icon icon super-checkmark-circled" ng-click="congratsAlert($index)" ng-if="task.done"></a>
+      </div>
+
+      <div class="col col-65">
+          <input type="text" ng-model="task.name" placeholder="Enter task">
+      </div>
+
+      <div class="col col-25">
+        <a class="button button-small button-icon icon super-ios-close" ng-if="task.done" ng-click="deleteTask($index)"></a>
+        <a class="button button-small button-icon icon super-edit" ng-if="task.done"></a>
+
+        <a class="button button-small button-icon icon super-ios-close" ng-if="!task.done" ng-click="deleteTask($index)"></a>
+        <a class="button button-small button-icon icon super-checkmark-circled" ng-if="!task.done"></a>
       </div>
 
     </div>

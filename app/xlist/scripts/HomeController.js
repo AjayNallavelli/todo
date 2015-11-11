@@ -5,6 +5,7 @@ angular
        'push',
   function($scope, $q, supersonic, Task, Store, deviceReady, slackbot, push) {
     $scope.tasks = [];
+    $scope.jsTasks = [];
 
     var overrideLocation = null;
 
@@ -118,8 +119,16 @@ angular
         success: function(results) {
           $scope.$apply(function($scope) {
             $scope.tasks = [];
+            $scope.jsTasks = [];
             for (var i = 0; i < results.length; i++) {
               $scope.tasks.push(results[i]);
+
+              var currentTask = {
+                name: results[i].get('name'),
+                done: results[i].get('done'),
+                deadline: results[i].get('deadline')
+              };
+              $scope.jsTasks.push(currentTask);
             }
           });
         },
@@ -146,6 +155,9 @@ angular
     };
 
     $scope.deleteTask = function(task) {
+      var taskToDelete = $scope.tasks[task];
+      task = taskToDelete;
+
       var options = {
         message: 'Are you sure you wish to delete this task?',
         buttonLabels: ['Yes', 'No']
@@ -176,6 +188,9 @@ angular
     };
 
     $scope.congratsAlert = function(task) {
+      var completedTask = $scope.tasks[task];
+      task = completedTask;
+
       task.save({
         done: !task.get('done')
       }, {
@@ -187,6 +202,7 @@ angular
             };
             supersonic.ui.dialog.alert('Congratulations!', options);
           }
+          getTasks();
         },
         error: function(error) {
           supersonic.ui.dialog.alert(
