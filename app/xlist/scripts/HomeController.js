@@ -137,13 +137,19 @@ angular
     //     });
 
     $scope.addGroceryList = function() {
-      $scope.ingredients.push({'name': '', 'quantity': ''});
+      var newTask = new Task();
+      newTask.set('name', '');
+      newTask.set('done', false);
+
+      $scope.tasks.push(newTask);
     };
+
     $scope.deleteGroceryList = function() {
-      // $scope.ingredients.push({'name': '', 'quantity': ''});
+
     };
+
     $scope.saveGroceryList = function() {
-      // $scope.ingredients.push({'name': '', 'quantity': ''});
+
     };
 
     $scope.congratsAlert = function(task) {

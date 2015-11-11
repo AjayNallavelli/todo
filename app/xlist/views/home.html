@@ -3,21 +3,30 @@
     <super-navbar-title>ToDo</super-navbar-title>
     <super-navbar-button ng-click="setLocation()">Set Location</super-navbar-button>
   </super-navbar>
-  <ul class="list">
-    <li class="item item-checkbox" ng-repeat="task in tasks">
-       <label class="checkbox">
-         <input type="checkbox" ng-click="congratsAlert(task)" ng-if="task.get('done')" checked>
-         <input type="checkbox" ng-click="congratsAlert(task)" ng-if="!task.get('done')">
-       </label>
-       {{ task.get('name') }}
-    </li>
-    <button class="button button-block button-positive" ng-click="addGroceryList()">
+
+  <div ng-repeat="task in tasks">
+    <div class="item item-input">
+      <div>
+        <button class="button button-icon icon super-ios-circle-outline" ng-click="congratsAlert(task)" ng-if="!task.get('done')"></button>
+        <button class="button button-icon icon super-checkmark-circled" ng-click="congratsAlert(task)" ng-if="task.get('done')"></button>
+      </div>
+
+      <div class="col col-65">
+          <input type="text" ng-model="task.attributes.name" placeholder="Enter task">
+      </div>
+
+      <div class="col col-25">
+        <a class="button button-small button-icon icon super-ios-close" ng-if="task.get('done')"></a>
+        <a class="button button-small button-icon icon super-edit" ng-if="task.get('done')"></a>
+
+        <a class="button button-small button-icon icon super-ios-close" ng-if="!task.get('done')"></a>
+        <a class="button button-small button-icon icon super-checkmark-circled" ng-if="!task.get('done')"></a>
+      </div>
+
+    </div>
+  </div>
+
+  <button class="button button-block button-positive" ng-click="addGroceryList()">
           Add Grocery
-    </button>
-    <button class="button button-block button-balanced" ng-click="saveGroceryList()">
-          Save
-    </button>
-
-  </ul>
-
+  </button>
 </div>
