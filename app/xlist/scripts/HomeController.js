@@ -135,14 +135,27 @@ angular
     //         message: JSON.stringify(notification)
     //       });
     //     });
-    $scope.addGroceryList = function() {
-      $scope.ingredients.push({'name': '', 'quantity': ''});
+
+    $scope.addGroceryList = function(task) {
+      task.save({
+        done: !task('done')
+      }, {
+        success: function(results) {
+          supersonic.ui.dialog.alert('Save success!');
+        },
+        error : function(results) {
+          supersonic.ui.dialog.alert('Save Failed!');
+        }
+      })
+      $scope.tasks.push({'name': '', 'quantity': ''});
     };
+
     $scope.deleteGroceryList = function() {
-      // $scope.ingredients.push({'name': '', 'quantity': ''});
+      // $scope.tasks.push({'name': '', 'quantity': ''});
     };
+
     $scope.saveGroceryList = function() {
-      // $scope.ingredients.push({'name': '', 'quantity': ''});
+      // $scope.tasks.push({'name': '', 'quantity': ''});
     };
 
     $scope.congratsAlert = function(task) {
