@@ -136,7 +136,6 @@ angular
     //       });
     //     });
 
-<<<<<<< HEAD
     $scope.addGroceryList = function(task) {
       task.save({
         done: !task('done')
@@ -148,11 +147,12 @@ angular
           supersonic.ui.dialog.alert('Save Failed!');
         }
       })
-      $scope.tasks.push({'name': '', 'quantity': ''});
-=======
+    
+    $scope.tasks.push({'name': '', 'quantity': ''});
+
     $scope.addGroceryList = function() {
-      $scope.ingredients.push({'name': '', 'quantity': ''});
->>>>>>> 380f1fca59dbea6e955934ea61a6d18d95052cbc
+      $scope.tasks.push({'name': '', 'quantity': ''});
+
     };
 
     $scope.deleteGroceryList = function() {
