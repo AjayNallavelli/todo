@@ -117,6 +117,7 @@ angular
       queryTasks.find({
         success: function(results) {
           $scope.$apply(function($scope) {
+            $scope.tasks = [];
             for (var i = 0; i < results.length; i++) {
               $scope.tasks.push(results[i]);
             }
@@ -136,7 +137,7 @@ angular
     //       });
     //     });
 
-    $scope.addGroceryList = function() {
+    $scope.addTask = function() {
       var newTask = new Task();
       newTask.set('name', '');
       newTask.set('done', false);
@@ -144,11 +145,33 @@ angular
       $scope.tasks.push(newTask);
     };
 
-    $scope.deleteGroceryList = function() {
+    $scope.deleteTask = function(task) {
+      var options = {
+        message: 'Are you sure you wish to delete this task?',
+        buttonLabels: ['Yes', 'No']
+      };
 
+      supersonic.ui.dialog.confirm('Confim', options).then(function(index) {
+        if (index === 0) {
+          task.destroy({
+            success: function(results) {
+              getTasks();
+              var options = {
+                message: 'Task successfully deleted',
+                buttonLabel: 'Close'
+              };
+              supersonic.ui.dialog.alert('Success', options);
+            },
+            error: function(results, error) {
+              supersonic.ui.dialog.alert(
+                'Error: ' + error.code + ' ' + error.message);
+            }
+          });
+        }
+      });
     };
 
-    $scope.saveGroceryList = function() {
+    $scope.saveTask = function() {
 
     };
 
