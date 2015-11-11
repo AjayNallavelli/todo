@@ -126,7 +126,13 @@ angular
               var currentTask = {
                 name: results[i].get('name'),
                 done: results[i].get('done'),
-                deadline: results[i].get('deadline')
+                deadline: results[i].get('deadline'),
+                editing: false,
+                edited: {
+                  name: results[i].get('name'),
+                  done: results[i].get('done'),
+                  deadline: results[i].get('deadline'),
+                }
               };
               $scope.jsTasks.push(currentTask);
             }
@@ -183,13 +189,70 @@ angular
       });
     };
 
-    $scope.saveTask = function() {
-
+    $scope.editTask = function(task) {
+      task.editing = true;
     };
 
-    $scope.congratsAlert = function(task) {
-      var completedTask = $scope.tasks[task];
-      task = completedTask;
+    $scope.discardEdits = function(index) {
+      var options = {
+        message: 'Do you wish to discard changes?',
+        buttonLabels: ['Yes', 'No']
+      };
+
+      supersonic.ui.dialog.confirm('Confim', options).then(function(index) {
+        if (index === 0) {
+          var oldTask = {
+            name: $scope.jsTasks[index].name,
+            done: $scope.jsTasks[index].done,
+            deadline: $scope.jsTasks[index].deadline,
+            editing: false,
+            edited: {
+              name: $scope.jsTasks[index].name,
+              done: $scope.jsTasks[index].done,
+              deadline: $scope.jsTasks[index].deadline,
+            }
+          };
+
+          $scope.jsTasks[index] = oldTask;
+          $scope.apply();
+        }
+      });
+    };
+
+    $scope.saveTask = function(index) {
+      var currentParseTask = $scope.tasks[index];
+      var currentJSTask = $scope.jsTasks[index];
+
+      currentParseTask.save({
+        name: currentJSTask.edited.name,
+        done: false,
+        deadline: currentJSTask.edited.deadline
+      }, {
+        success: function(result) {
+          var currentTask = {
+            name: result.get('name'),
+            done: result.get('done'),
+            deadline: result.get('deadline'),
+            editing: false,
+            edited: {
+              name: result.get('name'),
+              done: result.get('done'),
+              deadline: result.get('deadline'),
+            }
+          };
+
+          $scope.jsTasks[index] = currentTask;
+        },
+        error: function(error) {
+          supersonic.ui.dialog.alert(
+                'Error: ' + error.code + ' ' + error.message);
+        }
+      });
+    };
+
+    $scope.congratsAlert = function(index) {
+      var completedTask = $scope.tasks[index];
+      var task = completedTask;
 
       task.save({
         done: !task.get('done')
