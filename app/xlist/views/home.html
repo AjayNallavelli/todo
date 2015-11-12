@@ -38,46 +38,57 @@
     <super-navbar-button ng-click="setLocation()">Set Location</super-navbar-button>
   </super-navbar>
 
-  <div ng-repeat="task in jsTasks">
-    <div class="item item-input">
-      <div>
-        <a class="button button-icon icon super-ios-circle-outline" ng-click="congratsAlert($index)" ng-if="!task.done"></a>
-        <a class="button button-icon icon super-checkmark-circled" ng-click="congratsAlert($index)" ng-if="task.done"></a>
+  <!-- This UI is just for now, because it's 4:00am and I wanna go to bed -->
+  <div class="card">
+    <div class="item item-divider">
+      Grocery Store
+    </div>
+    <div ng-repeat="task in jsTasks">
+      <div class="item item-input">
+        <div>
+          <a class="button button-icon icon super-ios-circle-outline" ng-click="congratsAlert($index)" ng-if="!task.done"></a>
+          <a class="button button-icon icon super-checkmark-circled" ng-click="congratsAlert($index)" ng-if="task.done"></a>
+        </div>
+
+    <!-- THIS WORKS WITH THE PARSE SERVICE FUNCTIONS IN HOMECONTROLLER -->
+    <!-- <div ng-repeat="task in tasks">
+      <div class="item item-input">
+        <div>
+          <a class="button button-icon icon super-ios-circle-outline" ng-click="congratsAlert($index)" ng-if="!task.get('done')"></a>
+          <a class="button button-icon icon super-checkmark-circled" ng-click="congratsAlert($index)" ng-if="task.get('done')"></a>
+        </div> -->
+
+
+        <div class="col col-65">
+            <input type="text" ng-model="task.edited.name" placeholder="Enter task" ng-if="task.editing">
+            <p ng-if="!task.editing">{{ task.name }}</p>
+        </div>
+
+        <!-- THIS WORKS WITH THE PARSE SERVICE FUNCTIONS IN HOMECONTROLLER -->
+        <!-- <div class="col col-65">
+            <input type="text" ng-model="task.name" placeholder="Enter task" ng-if="task.editing">
+            <p ng-if="!task.editing">{{ task.get('name') }}</p>
+        </div> -->
+
+        <div class="col col-25">
+          <a class="button button-small button-icon icon super-ios-close" ng-if="!task.editing" ng-click="deleteTask($index)"></a>
+          <a class="button button-small button-icon icon super-edit" ng-if="!task.editing" ng-click="editTask(task)"></a>
+
+          <a class="button button-small button-icon icon super-ios-close" ng-if="task.editing" ng-click="discardEdits($index)"></a>
+          <a class="button button-small button-icon icon super-checkmark-circled" ng-if="task.editing" ng-click="saveTask($index)"></a>
+        </div>
+
       </div>
-
-  <!-- THIS WORKS WITH THE PARSE SERVICE FUNCTIONS IN HOMECONTROLLER -->
-  <!-- <div ng-repeat="task in tasks">
-    <div class="item item-input">
-      <div>
-        <a class="button button-icon icon super-ios-circle-outline" ng-click="congratsAlert($index)" ng-if="!task.get('done')"></a>
-        <a class="button button-icon icon super-checkmark-circled" ng-click="congratsAlert($index)" ng-if="task.get('done')"></a>
-      </div> -->
-
-
-      <div class="col col-65">
-          <input type="text" ng-model="task.edited.name" placeholder="Enter task" ng-if="task.editing">
-          <p ng-if="!task.editing">{{ task.name }}</p>
-      </div>
-
-      <!-- THIS WORKS WITH THE PARSE SERVICE FUNCTIONS IN HOMECONTROLLER -->
-      <!-- <div class="col col-65">
-          <input type="text" ng-model="task.name" placeholder="Enter task" ng-if="task.editing">
-          <p ng-if="!task.editing">{{ task.get('name') }}</p>
-      </div> -->
-
-      <div class="col col-25">
-        <a class="button button-small button-icon icon super-ios-close" ng-if="!task.editing" ng-click="deleteTask($index)"></a>
-        <a class="button button-small button-icon icon super-edit" ng-if="!task.editing" ng-click="editTask(task)"></a>
-
-        <a class="button button-small button-icon icon super-ios-close" ng-if="task.editing" ng-click="discardEdits($index)"></a>
-        <a class="button button-small button-icon icon super-checkmark-circled" ng-if="task.editing" ng-click="saveTask($index)"></a>
-      </div>
-
     </div>
   </div>
 
   <button class="button button-block button-positive" ng-click="addTask()">
-    Add Grocery
+    Add Item
   </button>
 
+  <super-navigate location="xlist#location">
+    <button class="button button-block button-positive">
+      Add Location
+    </button>
+  </super-navigate>
 </div>
