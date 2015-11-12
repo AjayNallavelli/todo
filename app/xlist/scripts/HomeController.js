@@ -173,7 +173,6 @@ angular
       $scope.jsTasks.push(newJSTask);
     };
 
-
     // THESE FUNCTIONS WORK USING THE PARSE SERVICE FOR BINDING
     // WE SHOULD UPDATE THE EDIT AND DELETE FUNCTIONS TOO
     // var getTasks = function() {

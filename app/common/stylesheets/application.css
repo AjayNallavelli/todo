@@ -3,3 +3,12 @@
   text-align: center;
   font-weight: 600;
 }
+
+.angular-google-map-container { 
+	height: 600px; 
+}
+
+#map-search-box {
+	width: 100%;
+	padding: 5px;
+}
