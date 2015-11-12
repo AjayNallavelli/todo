@@ -2,8 +2,8 @@ angular
   .module('xlist')
   .controller('HomeController',
       ['$scope', '$q', 'supersonic', 'Task', 'Store', 'deviceReady', 'slackbot',
-       'push',
-  function($scope, $q, supersonic, Task, Store, deviceReady, slackbot, push) {
+       'push', 'ParseQuery', 'ParseObject',
+  function($scope, $q, supersonic, Task, Store, deviceReady, slackbot, push, ParseQuery, ParseObject) {
     $scope.tasks = [];
     $scope.jsTasks = [];
 
@@ -20,7 +20,7 @@ angular
           Math.sin(dLong / 2) * Math.sin(dLong / 2);
       var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
       var d = R * c; // d = distance in meters
-      return d; // Returns the distance in meters.
+      return 1609*d; // Returns the distance in miles.
     };
 
     var makeCoords = function(latitude, longitude) {
@@ -113,6 +113,13 @@ angular
       }, 10 * 1000);
     });
 
+    // supersonic.device.push.foregroundNotifications().onValue(
+    //     function(notification) {
+    //       supersonic.ui.dialog.alert('Push Notification', {
+    //         message: JSON.stringify(notification)
+    //       });
+    //     });
+
     var getTasks = function() {
       var queryTasks = new Parse.Query(Task);
       queryTasks.find({
@@ -145,13 +152,6 @@ angular
       });
     };
 
-    // supersonic.device.push.foregroundNotifications().onValue(
-    //     function(notification) {
-    //       supersonic.ui.dialog.alert('Push Notification', {
-    //         message: JSON.stringify(notification)
-    //       });
-    //     });
-
     $scope.addTask = function() {
       var newParseTask = new Task();
       newParseTask.set('name', '');
@@ -172,6 +172,24 @@ angular
       $scope.tasks.push(newParseTask);
       $scope.jsTasks.push(newJSTask);
     };
+
+
+    // THESE FUNCTIONS WORK USING THE PARSE SERVICE FOR BINDING
+    // WE SHOULD UPDATE THE EDIT AND DELETE FUNCTIONS TOO
+    // var getTasks = function() {
+    //   var query = new Parse.Query(Task);
+    //   ParseQuery(query, {functionToCall:'find'}).then(function(results){
+    //     $scope.tasks = [];
+    //     for (var i = 0; i < results.length; i++) {
+    //       $scope.tasks.push(results[i]);
+    //       console.log($scope.tasks);
+    //     }
+    //   });
+    // };
+    // $scope.addTask = function() {
+    //   $scope.tasks.push(new ParseObject(new Task(), ['name']));
+    //   console.log($scope.tasks);
+    // };
 
     $scope.deleteTask = function(task) {
       var taskToDelete = $scope.tasks[task];

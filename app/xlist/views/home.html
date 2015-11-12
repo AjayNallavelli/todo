@@ -45,10 +45,25 @@
         <a class="button button-icon icon super-checkmark-circled" ng-click="congratsAlert($index)" ng-if="task.done"></a>
       </div>
 
+  <!-- THIS WORKS WITH THE PARSE SERVICE FUNCTIONS IN HOMECONTROLLER -->
+  <!-- <div ng-repeat="task in tasks">
+    <div class="item item-input">
+      <div>
+        <a class="button button-icon icon super-ios-circle-outline" ng-click="congratsAlert($index)" ng-if="!task.get('done')"></a>
+        <a class="button button-icon icon super-checkmark-circled" ng-click="congratsAlert($index)" ng-if="task.get('done')"></a>
+      </div> -->
+
+
       <div class="col col-65">
           <input type="text" ng-model="task.edited.name" placeholder="Enter task" ng-if="task.editing">
           <p ng-if="!task.editing">{{ task.name }}</p>
       </div>
+
+      <!-- THIS WORKS WITH THE PARSE SERVICE FUNCTIONS IN HOMECONTROLLER -->
+      <!-- <div class="col col-65">
+          <input type="text" ng-model="task.name" placeholder="Enter task" ng-if="task.editing">
+          <p ng-if="!task.editing">{{ task.get('name') }}</p>
+      </div> -->
 
       <div class="col col-25">
         <a class="button button-small button-icon icon super-ios-close" ng-if="!task.editing" ng-click="deleteTask($index)"></a>
