@@ -61,7 +61,8 @@
 
         <div class="col col-65">
             <input type="text" ng-model="task.edited.name" placeholder="Enter task" ng-if="task.editing">
-            <p ng-if="!task.editing">{{ task.name }}</p>
+            <p ng-if="!task.editing && !task.done">{{ task.name }}</p>
+            <p ng-if="!task.editing && task.done"><s>{{ task.name }}</s></p>
         </div>
 
         <!-- THIS WORKS WITH THE PARSE SERVICE FUNCTIONS IN HOMECONTROLLER -->
@@ -71,11 +72,11 @@
         </div> -->
 
         <div class="col col-25">
-          <a class="button button-small button-icon icon super-ios-close" ng-if="!task.editing" ng-click="deleteTask($index)"></a>
           <a class="button button-small button-icon icon super-edit" ng-if="!task.editing" ng-click="editTask(task)"></a>
+          <a class="button button-small button-icon icon super-ios-close" ng-if="!task.editing" ng-click="deleteTask($index)"></a>
 
-          <a class="button button-small button-icon icon super-ios-close" ng-if="task.editing" ng-click="discardEdits($index)"></a>
           <a class="button button-small button-icon icon super-checkmark-circled" ng-if="task.editing" ng-click="saveTask($index)"></a>
+          <a class="button button-small button-icon icon super-ios-close" ng-if="task.editing" ng-click="discardEdits($index)"></a>
         </div>
 
       </div>
