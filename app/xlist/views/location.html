@@ -7,7 +7,7 @@
     <script type="text/ng-template" id="searchbox.tpl.html">
       <input id="map-search-box" type="text" placeholder="Search">
     </script>
-    <ui-gmap-google-map center="map.center" zoom="map.zoom" draggable="true">
+    <ui-gmap-google-map center="map.center" zoom="map.zoom" draggable="true" options="options">
       <ui-gmap-search-box template="searchbox.template" events="searchbox.events"></ui-gmap-search-box>
     </ui-gmap-google-map>
   </div>

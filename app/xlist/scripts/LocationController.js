@@ -7,6 +7,9 @@ angular
    
     var makeMap = function() {
       $scope.map = { center: { latitude: 42.0464, longitude: -87.6947 }, zoom: 12 };
+      $scope.options = {
+        autocomplete: true;
+      }
       var events = {
         places_changed: function (searchBox) {}
       }
