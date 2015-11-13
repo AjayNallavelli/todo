@@ -2,8 +2,8 @@ angular
   .module('xlist')
   .controller('HomeController',
       ['$scope', '$q', 'supersonic', 'Task', 'Store', 'deviceReady', 'slackbot',
-       'push', 'ParseQuery', 'ParseObject',
-  function($scope, $q, supersonic, Task, Store, deviceReady, slackbot, push, ParseQuery, ParseObject) {
+       'push',
+  function($scope, $q, supersonic, Task, Store, deviceReady, slackbot, push) {
     $scope.tasks = [];
     $scope.jsTasks = [];
 
@@ -172,23 +172,6 @@ angular
       $scope.tasks.push(newParseTask);
       $scope.jsTasks.push(newJSTask);
     };
-
-    // THESE FUNCTIONS WORK USING THE PARSE SERVICE FOR BINDING
-    // WE SHOULD UPDATE THE EDIT AND DELETE FUNCTIONS TOO
-    // var getTasks = function() {
-    //   var query = new Parse.Query(Task);
-    //   ParseQuery(query, {functionToCall:'find'}).then(function(results){
-    //     $scope.tasks = [];
-    //     for (var i = 0; i < results.length; i++) {
-    //       $scope.tasks.push(results[i]);
-    //       console.log($scope.tasks);
-    //     }
-    //   });
-    // };
-    // $scope.addTask = function() {
-    //   $scope.tasks.push(new ParseObject(new Task(), ['name']));
-    //   console.log($scope.tasks);
-    // };
 
     $scope.deleteTask = function(task) {
       var taskToDelete = $scope.tasks[task];
