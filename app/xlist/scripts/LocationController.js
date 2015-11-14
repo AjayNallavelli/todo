@@ -1,10 +1,8 @@
 angular
   .module('xlist')
   .controller('LocationController',
-      ['$scope', '$q', 'supersonic', 'Task', 'Store', 'deviceReady', 'slackbot',
-       'push', 'uiGmapGoogleMapApi',
-  function($scope, $q, supersonic, Task, Store, deviceReady, slackbot, push, uiGmapGoogleMapApi) {
-   
+      ['$scope', 'supersonic', 'deviceReady', 'uiGmapGoogleMapApi',
+  function($scope, supersonic, deviceReady, uiGmapGoogleMapApi) {
     $scope.map = null;
     $scope.markers = [];
     $scope.options = {
@@ -23,23 +21,25 @@ angular
       $scope.map.zoom = 16;
       $scope.markers = [marker];
     };
-    $scope.searchbox = { 
-      template:'searchbox.tpl.html', 
+    $scope.searchbox = {
+      template: 'searchbox.tpl.html',
       events: {
+        // jscs:disable requireCamelCaseOrUpperCaseIdentifiers
         places_changed: placesChanged
+        // jscs:enable requireCamelCaseOrUpperCaseIdentifiers
       }
     };
-    supersonic.ui.views.current.whenVisible(function() { 
+    supersonic.ui.views.current.whenVisible(function() {
       deviceReady().then(function() {
         supersonic.device.geolocation.getPosition().then(function(position) {
-          $scope.map = { 
-            center: { 
+          $scope.map = {
+            center: {
               latitude: position.coords.latitude,
-              longitude: position.coords.longitude 
-            }, 
-            zoom: 12 
+              longitude: position.coords.longitude
+            },
+            zoom: 12
           };
-        })
-      })
-    })
+        });
+      });
+    });
   }]);
