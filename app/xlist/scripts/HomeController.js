@@ -2,10 +2,11 @@ angular
   .module('xlist')
   .controller('HomeController',
       ['$scope', '$q', 'supersonic', 'Task', 'Store', 'deviceReady', 'slackbot',
-       'push', 'ParseQuery', 'ParseObject',
-  function($scope, $q, supersonic, Task, Store, deviceReady, slackbot, push, ParseQuery, ParseObject) {
+       'push', 'ParseObject', 'ParseQuery',
+  function($scope, $q, supersonic, Task, Store, deviceReady, slackbot, push, ParseObject, ParseQuery) {
     $scope.tasks = [];
     $scope.jsTasks = [];
+    var fields = ['name', 'done', 'category', 'deadline'];
 
     var overrideLocation = null;
 
@@ -120,76 +121,78 @@ angular
     //       });
     //     });
 
-    var getTasks = function() {
-      var queryTasks = new Parse.Query(Task);
-      queryTasks.find({
-        success: function(results) {
-          $scope.$apply(function($scope) {
-            $scope.tasks = [];
-            $scope.jsTasks = [];
-            for (var i = 0; i < results.length; i++) {
-              $scope.tasks.push(results[i]);
+    // var getTasks = function() {
+    //   var queryTasks = new Parse.Query(Task);
+    //   queryTasks.find({
+    //     success: function(results) {
+    //       $scope.$apply(function($scope) {
+    //         $scope.tasks = [];
+    //         $scope.jsTasks = [];
+    //         for (var i = 0; i < results.length; i++) {
+    //           $scope.tasks.push(results[i]);
 
-              var currentTask = {
-                name: results[i].get('name'),
-                done: results[i].get('done'),
-                deadline: results[i].get('deadline'),
-                editing: false,
-                edited: {
-                  name: results[i].get('name'),
-                  done: results[i].get('done'),
-                  deadline: results[i].get('deadline'),
-                }
-              };
-              $scope.jsTasks.push(currentTask);
-            }
-          });
-        },
-        error: function(error) {
-          supersonic.ui.dialog.alert(
-              'Error: ' + error.code + ' ' + error.message);
-        }
-      });
-    };
+    //           var currentTask = {
+    //             name: results[i].get('name'),
+    //             done: results[i].get('done'),
+    //             deadline: results[i].get('deadline'),
+    //             editing: false,
+    //             edited: {
+    //               name: results[i].get('name'),
+    //               done: results[i].get('done'),
+    //               deadline: results[i].get('deadline'),
+    //             }
+    //           };
+    //           $scope.jsTasks.push(currentTask);
+    //         }
+    //       });
+    //     },
+    //     error: function(error) {
+    //       supersonic.ui.dialog.alert(
+    //           'Error: ' + error.code + ' ' + error.message);
+    //     }
+    //   });
+    // };
 
-    $scope.addTask = function() {
-      var newParseTask = new Task();
-      newParseTask.set('name', '');
-      newParseTask.set('done', false);
+    // $scope.addTask = function() {
+    //   var newParseTask = new Task();
+    //   newParseTask.set('name', '');
+    //   newParseTask.set('done', false);
 
-      var newJSTask = {
-        name: '',
-        done: false,
-        deadline: undefined,
-        editing: true,
-        edited: {
-          name: '',
-          done: false,
-          deadline: undefined,
-        }
-      };
+    //   var newJSTask = {
+    //     name: '',
+    //     done: false,
+    //     deadline: undefined,
+    //     editing: true,
+    //     edited: {
+    //       name: '',
+    //       done: false,
+    //       deadline: undefined,
+    //     }
+    //   };
 
-      $scope.tasks.push(newParseTask);
-      $scope.jsTasks.push(newJSTask);
-    };
+    //   $scope.tasks.push(newParseTask);
+    //   $scope.jsTasks.push(newJSTask);
+    // };
 
 
     // THESE FUNCTIONS WORK USING THE PARSE SERVICE FOR BINDING
     // WE SHOULD UPDATE THE EDIT AND DELETE FUNCTIONS TOO
-    // var getTasks = function() {
-    //   var query = new Parse.Query(Task);
-    //   ParseQuery(query, {functionToCall:'find'}).then(function(results){
-    //     $scope.tasks = [];
-    //     for (var i = 0; i < results.length; i++) {
-    //       $scope.tasks.push(results[i]);
-    //       console.log($scope.tasks);
-    //     }
-    //   });
-    // };
-    // $scope.addTask = function() {
-    //   $scope.tasks.push(new ParseObject(new Task(), ['name']));
-    //   console.log($scope.tasks);
-    // };
+    var getTasks = function() {
+      var query = new Parse.Query(Task);
+      ParseQuery(query, {functionToCall:'find'}).then(function(results){
+        $scope.tasks = [];
+        for (var i = 0; i < results.length; i++) {
+          $scope.tasks.push(new ParseObject(results[i], fields));
+        }
+
+        window.alert(JSON.stringify(new ParseObject(results[0], fields)));
+      });
+    };
+
+    $scope.addTask = function() {
+      $scope.tasks.push(new ParseObject(new Task(), ['name']));
+      console.log($scope.tasks);
+    };
 
     $scope.deleteTask = function(task) {
       var taskToDelete = $scope.tasks[task];
