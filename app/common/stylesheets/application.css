@@ -1,5 +1,28 @@
+html, body {
+  height: 100%;
+  width: 100%;
+}
+
 .supersonic-navbar-mock {
   background-color: #00B5FF !important;
   text-align: center;
   font-weight: 600;
+}
+
+#map_canvas {
+  position: relative;
+  height: 100%;
+  width: 100%;
+}
+
+.angular-google-map-container {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+
+.card {
+  margin: 0px;
 }

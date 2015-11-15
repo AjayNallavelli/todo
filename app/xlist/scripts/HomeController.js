@@ -1,10 +1,10 @@
 angular
   .module('xlist')
   .controller('HomeController',
-      ['$scope', '$q', 'supersonic', 'Task', 'Store', 'deviceReady', 'slackbot',
+      ['$scope', '$q', 'supersonic', 'Task', 'deviceReady', 'slackbot',
        'push', 'ParseObject', 'ParseQuery',
-  function($scope, $q, supersonic, Task, Store, deviceReady, slackbot, push,
-    ParseObject, ParseQuery) {
+  function($scope, $q, supersonic, Task, deviceReady, slackbot, push,
+           ParseObject, ParseQuery) {
     $scope.tasks = [];
     var fields = ['name', 'done', 'category', 'deadline'];
 

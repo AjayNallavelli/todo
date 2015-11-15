@@ -1,5 +1,4 @@
 {
-  "camelcase" : true,
   "undef": true,
   "curly": true,
   "devel": true,

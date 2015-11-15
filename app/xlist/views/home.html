@@ -23,11 +23,16 @@
         <a class="button button-small button-icon icon super-ios-close" ng-if="task.editing" ng-click="discardEdits(task)"></a>
         <a class="button button-small button-icon icon super-checkmark-circled" ng-if="task.editing" ng-click="saveTask(task)"></a>
       </div>
-
     </div>
   </div>
 
   <button class="button button-block button-positive" ng-click="addTask()">
-          Add Grocery
+    Add Item
   </button>
+
+  <super-navigate location="xlist#location">
+    <button class="button button-block button-positive">
+      Add Location
+    </button>
+  </super-navigate>
 </div>

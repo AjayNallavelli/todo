@@ -1,3 +1,5 @@
+/* jscs:disable */
+/* jshint ignore:start */
 angular.module('ParseServices', [])
 
 .factory('ParseSDK', function(){
@@ -54,10 +56,10 @@ angular.module('ParseServices', [])
 		var	parseObject = parseData;
 		var model;
 
-		//instantiate new parse object from string 
+		//instantiate new parse object from string
 		if(typeof parseData == 'string')
 		{
-			var ParseModel = Parse.Object.extend(parseData);		
+			var ParseModel = Parse.Object.extend(parseData);
 			parseObject = new ParseModel();
 		}
 
