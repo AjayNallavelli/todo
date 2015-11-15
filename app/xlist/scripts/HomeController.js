@@ -1,10 +1,12 @@
 angular
   .module('xlist')
   .controller('HomeController',
-      ['$scope', '$q', 'supersonic', 'Task', 'Store', 'deviceReady', 'slackbot',
-       'push',
-  function($scope, $q, supersonic, Task, Store, deviceReady, slackbot, push) {
+      ['$scope', '$q', 'supersonic', 'Task', 'deviceReady', 'slackbot',
+       'push', 'ParseObject', 'ParseQuery',
+  function($scope, $q, supersonic, Task, deviceReady, slackbot, push,
+           ParseObject, ParseQuery) {
     $scope.tasks = [];
+    var fields = ['name', 'done', 'category', 'deadline'];
 
     var overrideLocation = null;
 
@@ -19,7 +21,7 @@ angular
           Math.sin(dLong / 2) * Math.sin(dLong / 2);
       var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
       var d = R * c; // d = distance in meters
-      return d; // Returns the distance in meters.
+      return 1609 * d; // Returns the distance in miles.
     };
 
     var makeCoords = function(latitude, longitude) {
@@ -112,23 +114,6 @@ angular
       }, 10 * 1000);
     });
 
-    var getTasks = function() {
-      var queryTasks = new Parse.Query(Task);
-      queryTasks.find({
-        success: function(results) {
-          $scope.$apply(function($scope) {
-            for (var i = 0; i < results.length; i++) {
-              $scope.tasks.push(results[i]);
-            }
-          });
-        },
-        error: function(error) {
-          supersonic.ui.dialog.alert(
-              'Error: ' + error.code + ' ' + error.message);
-        }
-      });
-    };
-
     // supersonic.device.push.foregroundNotifications().onValue(
     //     function(notification) {
     //       supersonic.ui.dialog.alert('Push Notification', {
@@ -136,24 +121,102 @@ angular
     //       });
     //     });
 
+    var getTasks = function() {
+      var query = new Parse.Query(Task);
+      ParseQuery(query, {functionToCall: 'find'})
+        .then(function(results) {
+          $scope.tasks = [];
+          for (var i = 0; i < results.length; i++) {
+            $scope.tasks.push(new ParseObject(results[i], fields));
+            $scope.tasks[i].editing = false;
+          }
+        }, function(error) {
+          supersonic.ui.dialog.alert(
+            'Error: ' + error.code + ' ' + error.message);
+        });
+    };
+
+    $scope.addTask = function() {
+      var newTask = new ParseObject(new Task(), fields);
+      newTask.category = '';
+      newTask.done = false;
+      newTask.editing = true;
+
+      $scope.tasks.push(newTask);
+    };
+
+    $scope.deleteTask = function(task) {
+      var options = {
+        message: 'Are you sure you wish to delete this task?',
+        buttonLabels: ['Yes', 'No']
+      };
+
+      supersonic.ui.dialog.confirm('Confim', options)
+        .then(function(index) {
+          if (index === 0) {
+            task.delete()
+              .then(function(result) {
+                getTasks();
+              }, function(error) {
+                supersonic.ui.dialog.alert(
+                  'Error: ' + error.code + ' ' + error.message);
+              });
+          }
+        });
+    };
+
+    $scope.editTask = function(task) {
+      task.editing = true;
+    };
+
+    $scope.discardEdits = function(task) {
+      var options = {
+        message: 'Do you wish to discard changes?',
+        buttonLabels: ['Yes', 'No']
+      };
+
+      supersonic.ui.dialog.confirm('Confim', options)
+        .then(function(index) {
+          if (index === 0) {
+            task.fetch()
+              .then(function() {
+                task.editing = false;
+              }, function(error) {
+                supersonic.ui.dialog.alert(
+                  'Error: ' + error.code + ' ' + error.message);
+              });
+          }
+        });
+    };
+
+    $scope.saveTask = function(task) {
+      task.done = false;
+
+      task.save()
+        .then(function(results) {
+          task.editing = false;
+        }, function(error) {
+          supersonic.ui.dialog.alert(
+              'Error: ' + error.code + ' ' + error.message);
+        });
+    };
+
     $scope.congratsAlert = function(task) {
-      task.save({
-        done: !task.get('done')
-      }, {
-        success: function(results) {
-          if (task.get('done')) {
+      task.done = !task.done;
+      task.save()
+        .then(function(results) {
+          if (task.done) {
             var options = {
               message: 'You finished a task!',
               buttonLabel: 'Close'
             };
             supersonic.ui.dialog.alert('Congratulations!', options);
           }
-        },
-        error: function(error) {
+          getTasks();
+        }, function(error) {
           supersonic.ui.dialog.alert(
               'Error: ' + error.code + ' ' + error.message);
-        }
-      });
+        });
     };
 
     supersonic.ui.views.current.whenVisible(getTasks);
