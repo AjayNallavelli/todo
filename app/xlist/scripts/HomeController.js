@@ -138,7 +138,7 @@ angular
 
     $scope.addTask = function() {
       var newTask = new ParseObject(new Task(), fields);
-      newTask.category = "";
+      newTask.category = '';
       newTask.done = false;
       newTask.editing = true;
 
