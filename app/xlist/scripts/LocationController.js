@@ -1,25 +1,38 @@
 angular
   .module('xlist')
   .controller('LocationController',
-      ['$scope', 'supersonic', 'deviceReady', 'uiGmapGoogleMapApi',
-  function($scope, supersonic, deviceReady, uiGmapGoogleMapApi) {
-    $scope.map = null;
+      ['$scope', 'supersonic', 'deviceReady', 'GeoList', 'uiGmapGoogleMapApi',
+  function($scope, supersonic, deviceReady, GeoList, uiGmapGoogleMapApi) {
+    $scope.map = {
+      center: {
+        latitude: 0,
+        longitude: 0
+      },
+      zoom: 16
+    };
     $scope.markers = [];
     $scope.options = {
       autocomplete: true
     };
+
+    var geoList = null;
+
+    var setLocation = function(coords) {
+      $scope.markers = [{
+        id: 'id',
+        coords: coords
+      }];
+      $scope.map.center.latitude = coords.latitude;
+      $scope.map.center.longitude = coords.longitude;
+      console.log($scope.map);
+    };
+
     var placesChanged = function(searchBox) {
       var place = searchBox.getPlaces()[0];
-      var marker = {
-        id: 'id',
-        coords: {
-          latitude: place.geometry.location.lat(),
-          longitude: place.geometry.location.lng()
-        }
-      };
-      $scope.map.center = marker.coords;
-      $scope.map.zoom = 16;
-      $scope.markers = [marker];
+      setLocation({
+        latitude: place.geometry.location.lat(),
+        longitude: place.geometry.location.lng()
+      });
     };
     $scope.searchbox = {
       template: 'searchbox.tpl.html',
@@ -29,17 +42,41 @@ angular
         // jscs:enable requireCamelCaseOrUpperCaseIdentifiers
       }
     };
-    supersonic.ui.views.current.whenVisible(function() {
-      deviceReady().then(function() {
-        supersonic.device.geolocation.getPosition().then(function(position) {
-          $scope.map = {
-            center: {
-              latitude: position.coords.latitude,
-              longitude: position.coords.longitude
-            },
-            zoom: 12
-          };
+
+    var back = function() {
+      if (geoList && $scope.markers.length) {
+        geoList.save({
+          location: new Parse.GeoPoint($scope.markers[0].coords)
+        }).then(function() {
+          supersonic.ui.layers.pop();
         });
-      });
+      } else {
+        supersonic.ui.layers.pop();
+      }
+    };
+
+    var backButton = new supersonic.ui.NavigationBarButton({
+      title: 'Back',
+      onTap: back
     });
+
+    supersonic.ui.navigationBar.update({
+      title: 'ToDo',
+      overrideBackButton: true,
+      buttons: {
+        left: [backButton]
+      }
+    });
+
+    supersonic.device.buttons.back.whenPressed(back);
+
+    var getGeoList = function() {
+      var queryGeoLists = new Parse.Query(GeoList);
+      queryGeoLists.find().then(function(geoLists) {
+        geoList = geoLists[0];
+        setLocation(geoList.get('location'));
+      });
+    };
+
+    supersonic.ui.views.current.whenVisible(getGeoList);
   }]);

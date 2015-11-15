@@ -1,9 +1,9 @@
 angular
   .module('xlist')
   .controller('HomeController',
-      ['$scope', '$q', 'supersonic', 'Task', 'Store', 'deviceReady', 'slackbot',
+      ['$scope', '$q', 'supersonic', 'Task', 'deviceReady', 'slackbot',
        'push',
-  function($scope, $q, supersonic, Task, Store, deviceReady, slackbot, push) {
+  function($scope, $q, supersonic, Task, deviceReady, slackbot, push) {
     $scope.tasks = [];
     $scope.jsTasks = [];
 
