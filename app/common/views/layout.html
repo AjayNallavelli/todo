@@ -19,9 +19,14 @@
   <script src="//www.parsecdn.com/js/parse-1.6.4.min.js"></script>
   <script>Parse.initialize("VDhhLoxsxxX6XIxMfTr66guz1bzzZ3kr9p40wxbI", "ytT40Ghe8DFaUQ5Ni7fx7Az90VxNGXFFdjjdl2eF");</script>
 
-  <% _.each(yield.modules, function(module) { %>
+  <!-- <% _.each(yield.modules, function(module) { %>
   <script src="/app/<%= module %>.js"></script>
-  <% }); %>
+  <% }); %> -->
+
+  <script src="/app/common.js"></script>
+  <script src="/app/ParseServices.js"></script>
+  <script src="/app/xlist.js"></script>
+
 </head>
 <body ng-app="<%= yield.moduleName %>">
 
