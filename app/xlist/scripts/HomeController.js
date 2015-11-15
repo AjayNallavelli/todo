@@ -3,7 +3,8 @@ angular
   .controller('HomeController',
       ['$scope', '$q', 'supersonic', 'Task', 'Store', 'deviceReady', 'slackbot',
        'push', 'ParseObject', 'ParseQuery',
-  function($scope, $q, supersonic, Task, Store, deviceReady, slackbot, push, ParseObject, ParseQuery) {
+  function($scope, $q, supersonic, Task, Store, deviceReady, slackbot, push,
+    ParseObject, ParseQuery) {
     $scope.tasks = [];
     var fields = ['name', 'done', 'category', 'deadline'];
 
@@ -20,7 +21,7 @@ angular
           Math.sin(dLong / 2) * Math.sin(dLong / 2);
       var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
       var d = R * c; // d = distance in meters
-      return 1609*d; // Returns the distance in miles.
+      return 1609 * d; // Returns the distance in miles.
     };
 
     var makeCoords = function(latitude, longitude) {
@@ -120,166 +121,84 @@ angular
     //       });
     //     });
 
-    // var getTasks = function() {
-    //   var queryTasks = new Parse.Query(Task);
-    //   queryTasks.find({
-    //     success: function(results) {
-    //       $scope.$apply(function($scope) {
-    //         $scope.tasks = [];
-    //         $scope.jsTasks = [];
-    //         for (var i = 0; i < results.length; i++) {
-    //           $scope.tasks.push(results[i]);
-
-    //           var currentTask = {
-    //             name: results[i].get('name'),
-    //             done: results[i].get('done'),
-    //             deadline: results[i].get('deadline'),
-    //             editing: false,
-    //             edited: {
-    //               name: results[i].get('name'),
-    //               done: results[i].get('done'),
-    //               deadline: results[i].get('deadline'),
-    //             }
-    //           };
-    //           $scope.jsTasks.push(currentTask);
-    //         }
-    //       });
-    //     },
-    //     error: function(error) {
-    //       supersonic.ui.dialog.alert(
-    //           'Error: ' + error.code + ' ' + error.message);
-    //     }
-    //   });
-    // };
-
-    // $scope.addTask = function() {
-    //   var newParseTask = new Task();
-    //   newParseTask.set('name', '');
-    //   newParseTask.set('done', false);
-
-    //   var newJSTask = {
-    //     name: '',
-    //     done: false,
-    //     deadline: undefined,
-    //     editing: true,
-    //     edited: {
-    //       name: '',
-    //       done: false,
-    //       deadline: undefined,
-    //     }
-    //   };
-
-    //   $scope.tasks.push(newParseTask);
-    //   $scope.jsTasks.push(newJSTask);
-    // };
-
-
-    // THESE FUNCTIONS WORK USING THE PARSE SERVICE FOR BINDING
-    // WE SHOULD UPDATE THE EDIT AND DELETE FUNCTIONS TOO
     var getTasks = function() {
       var query = new Parse.Query(Task);
-      ParseQuery(query, {functionToCall:'find'})
-        .then(function(results){
+      ParseQuery(query, {functionToCall: 'find'})
+        .then(function(results) {
           $scope.tasks = [];
           for (var i = 0; i < results.length; i++) {
             $scope.tasks.push(new ParseObject(results[i], fields));
+            $scope.tasks[i].editing = false;
           }
+        }, function(error) {
+          supersonic.ui.dialog.alert(
+            'Error: ' + error.code + ' ' + error.message);
         });
     };
 
     $scope.addTask = function() {
-      $scope.tasks.push(new ParseObject(new Task(), ['name']));
-      console.log($scope.tasks);
+      var newTask = new ParseObject(new Task(), fields);
+      newTask.category = "";
+      newTask.done = false;
+      newTask.editing = true;
+
+      $scope.tasks.push(newTask);
     };
 
     $scope.deleteTask = function(task) {
-      var taskToDelete = $scope.tasks[task];
-      task = taskToDelete;
-
       var options = {
         message: 'Are you sure you wish to delete this task?',
         buttonLabels: ['Yes', 'No']
       };
 
-      supersonic.ui.dialog.confirm('Confim', options).then(function(index) {
-        if (index === 0) {
-          task.destroy({
-            success: function(results) {
-              getTasks();
-              var options = {
-                message: 'Task successfully deleted',
-                buttonLabel: 'Close'
-              };
-              supersonic.ui.dialog.alert('Success', options);
-            },
-            error: function(results, error) {
-              supersonic.ui.dialog.alert(
-                'Error: ' + error.code + ' ' + error.message);
-            }
-          });
-        }
-      });
+      supersonic.ui.dialog.confirm('Confim', options)
+        .then(function(index) {
+          if (index === 0) {
+            task.delete()
+              .then(function(result) {
+                getTasks();
+              }, function(error) {
+                supersonic.ui.dialog.alert(
+                  'Error: ' + error.code + ' ' + error.message);
+              });
+          }
+        });
     };
 
     $scope.editTask = function(task) {
       task.editing = true;
     };
 
-    $scope.discardEdits = function(index) {
+    $scope.discardEdits = function(task) {
       var options = {
         message: 'Do you wish to discard changes?',
         buttonLabels: ['Yes', 'No']
       };
 
-      supersonic.ui.dialog.confirm('Confim', options).then(function(index) {
-        if (index === 0) {
-          var oldTask = {
-            name: $scope.jsTasks[index].name,
-            done: $scope.jsTasks[index].done,
-            deadline: $scope.jsTasks[index].deadline,
-            editing: false,
-            edited: {
-              name: $scope.jsTasks[index].name,
-              done: $scope.jsTasks[index].done,
-              deadline: $scope.jsTasks[index].deadline,
-            }
-          };
-
-          $scope.jsTasks[index] = oldTask;
-          $scope.apply();
-        }
-      });
+      supersonic.ui.dialog.confirm('Confim', options)
+        .then(function(index) {
+          if (index === 0) {
+            task.fetch()
+              .then(function() {
+                task.editing = false;
+              }, function(error) {
+                supersonic.ui.dialog.alert(
+                  'Error: ' + error.code + ' ' + error.message);
+              });
+          }
+        });
     };
 
-    $scope.saveTask = function(index) {
-      var currentParseTask = $scope.tasks[index];
-      var currentJSTask = $scope.jsTasks[index];
+    $scope.saveTask = function(task) {
+      task.done = false;
 
-      currentParseTask.save({
-        name: currentJSTask.edited.name,
-        done: false,
-        deadline: currentJSTask.edited.deadline
-      }, {
-        success: function(result) {
-          var currentTask = {
-            name: result.get('name'),
-            done: result.get('done'),
-            deadline: result.get('deadline'),
-            editing: false,
-            edited: {
-              name: result.get('name'),
-              done: result.get('done'),
-              deadline: result.get('deadline'),
-            }
-          };
-
-          $scope.jsTasks[index] = currentTask;
-        },
-        error: function(error) {
+      task.save()
+        .then(function(results) {
+          task.editing = false;
+        }, function(error) {
           supersonic.ui.dialog.alert(
-                'Error: ' + error.code + ' ' + error.message);
-        }
-      });
+              'Error: ' + error.code + ' ' + error.message);
+        });
     };
 
     $scope.congratsAlert = function(task) {
