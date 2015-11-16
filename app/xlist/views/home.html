@@ -11,8 +11,8 @@
         <a class="button button-icon icon super-checkmark-circled" ng-click="congratsAlert(task)" ng-if="task.done"></a>
       </div>
 
-      <div class="col col-65">
-          <input type="text" ng-model="task.name" placeholder="Enter task" ng-if="task.editing">
+      <div class="task-list col col-65">
+          <textarea ng-model="task.name" placeholder="Enter task" ng-if="task.editing"></textarea>
           <p ng-if="!task.editing">{{ task.name }}</p>
       </div>
 

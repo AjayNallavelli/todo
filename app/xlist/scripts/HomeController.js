@@ -151,7 +151,7 @@ angular
         buttonLabels: ['Yes', 'No']
       };
 
-      supersonic.ui.dialog.confirm('Confim', options)
+      supersonic.ui.dialog.confirm('Confirm', options)
         .then(function(index) {
           if (index === 0) {
             task.delete()
@@ -175,7 +175,7 @@ angular
         buttonLabels: ['Yes', 'No']
       };
 
-      supersonic.ui.dialog.confirm('Confim', options)
+      supersonic.ui.dialog.confirm('Confirm', options)
         .then(function(index) {
           if (index === 0) {
             task.fetch()
