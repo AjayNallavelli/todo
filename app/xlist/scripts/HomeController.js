@@ -21,7 +21,7 @@ angular
           Math.sin(dLong / 2) * Math.sin(dLong / 2);
       var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
       var d = R * c; // d = distance in meters
-      return d/1609; // Returns the distance in miles.
+      return d / 1609; // Returns the distance in miles.
     };
 
     $scope.setLocation = function() {
@@ -121,14 +121,17 @@ angular
     };
 
     var initialize = function() {
+      var newGeoLists = [];
       var queryGeoLists = new Parse.Query(GeoList);
       queryGeoLists.each(function(geoList) {
         getTasks(geoList).then(function(tasks) {
-          $scope.geoLists.push({
+          newGeoLists.push({
             geoList: new ParseObject(geoList, GeoList.fields),
             tasks: tasks
           });
         });
+      }).then(function() {
+        $scope.geoLists = newGeoLists;
       });
     };
 

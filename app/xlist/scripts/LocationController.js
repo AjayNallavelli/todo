@@ -22,9 +22,10 @@ angular
         id: 'id',
         coords: coords
       }];
-      $scope.map.center.latitude = coords.latitude;
-      $scope.map.center.longitude = coords.longitude;
-      console.log($scope.map);
+      $scope.$apply(function($scope) {
+        $scope.map.center.latitude = coords.latitude;
+        $scope.map.center.longitude = coords.longitude;
+      });
     };
 
     var placesChanged = function(searchBox) {
@@ -72,14 +73,14 @@ angular
 
     var getGeoList = function() {
       supersonic.ui.views.current.params.onValue(function(params) {
-        console.log("HELLO");
         var queryGeoLists = new Parse.Query(GeoList);
-        console.log(params.id);
         queryGeoLists.get(params.id).then(function(result) {
           geoList = result;
-          setLocation(geoList.get('location'));
-          console.log(geoList);
-          console.log(geoList.get('location'));
+          var location = geoList.get('location');
+          setLocation({
+            latitude: location.latitude,
+            longitude: location.longitude
+          });
         });
       });
     };
