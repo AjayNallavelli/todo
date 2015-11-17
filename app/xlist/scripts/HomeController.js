@@ -158,8 +158,10 @@ angular
 
     $scope.taskEnter = function(event, index) {
       if (event.which === 13) {
-        $scope.saveTask($scope.tasks[index], index);
-        document.getElementById('task-' + index.toString()).blur();
+        var taskElement = document.getElementById('task-' + index.toString());
+        var taskContent = taskElement.innerText;
+        $scope.saveTask($scope.tasks[index], index, taskContent);
+        taskElement.blur();
       }
     };
 
@@ -197,7 +199,10 @@ angular
         });
     };
 
-    $scope.saveTask = function(task, index) {
+    $scope.saveTask = function(task, index, taskContent) {
+      if (!(taskContent == undefined)) {
+        task.name = taskContent; 
+      }
       task.name = task.name.trim();
       if (task.name !== '') {
         task.done = false;
