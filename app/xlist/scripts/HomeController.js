@@ -5,9 +5,9 @@ angular
        'slackbot', 'push', 'ParseObject', 'ParseQuery',
   function($scope, $q, supersonic, GeoList, Task, deviceReady, slackbot, push,
            ParseObject, ParseQuery) {
-    $scope.tasks = [];
+    // $scope.taskLists = [];
 
-    var geoLists = [];
+    $scope.geoLists = [];
     var overrideLocation = null;
 
     // Haversine formula for getting distance in miles.
@@ -21,7 +21,7 @@ angular
           Math.sin(dLong / 2) * Math.sin(dLong / 2);
       var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
       var d = R * c; // d = distance in meters
-      return 1609 * d; // Returns the distance in miles.
+      return d/1609; // Returns the distance in miles.
     };
 
     $scope.setLocation = function() {
@@ -29,8 +29,8 @@ angular
         message: 'Which list\'s location should the location be overridden by?',
       }).then(function(result) {
         if (result.buttonIndex === 0) {
-          for (var i = 0; i < geoLists.length; i++) {
-            var geoList = geoLists[i];
+          for (var i = 0; i < $scope.geoLists.length; i++) {
+            var geoList = $scope.geoLists[i];
             if (geoList.get('name').toLowerCase() ===
                 result.input.toLowerCase()) {
               overrideLocation = geoList.get('location');
@@ -80,8 +80,8 @@ angular
     var THRESHOLD = 50;
 
     var findNear = function(location) {
-      for (var i = 0; i < geoLists.length; i++) {
-        var geoList = geoLists[i];
+      for (var i = 0; i < $scope.geoLists.length; i++) {
+        var geoList = $scope.geoLists[i];
         var distance = getDistance(location, geoList.get('location'));
         if (distance < THRESHOLD) {
           pushNear(geoList);
@@ -102,26 +102,37 @@ angular
       }, 10 * 1000);
     });
 
-    var getTasks = function() {
+    var getTasks = function(geoList) {
+      var deferred = $q.defer();
       var queryTasks = new Parse.Query(Task);
-      ParseQuery(queryTasks, {functionToCall: 'find'})
+      queryTasks.equalTo('geoList', geoList.toPointer()).find()
           .then(function(results) {
-            $scope.tasks = [];
+            var tasks = [];
             for (var i = 0; i < results.length; i++) {
-              $scope.tasks.push(new ParseObject(results[i], Task.fields));
-              $scope.tasks[i].editing = false;
+              tasks.push(new ParseObject(results[i], Task.fields));
+              tasks[i].editing = false;
             }
+            deferred.resolve(tasks);
           }, function(error) {
             supersonic.ui.dialog.alert(
               'Error: ' + error.code + ' ' + error.message);
           });
+      return deferred.promise;
     };
 
     var initialize = function() {
-      getTasks();
       var queryGeoLists = new Parse.Query(GeoList);
+      queryGeoLists.each(function(geoList) {
+        getTasks(geoList).then(function(tasks) {
+          $scope.geoLists.push({
+            geoList: new ParseObject(geoList, GeoList.fields),
+            tasks: tasks
+          });
+        });
+      });
+
       queryGeoLists.find().then(function(results) {
-        geoLists = results;
+        $scope.geoLists = results;
       });
     };
 

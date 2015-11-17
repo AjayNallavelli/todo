@@ -3,37 +3,44 @@
     <super-navbar-title>ToDo</super-navbar-title>
   </super-navbar>
 
-  <div ng-repeat="task in tasks">
-    <div class="item item-input">
-      <div>
-        <a class="button button-icon icon super-ios-circle-outline" ng-click="congratsAlert(task)" ng-if="!task.done"></a>
-        <a class="button button-icon icon super-checkmark-circled" ng-click="congratsAlert(task)" ng-if="task.done"></a>
-      </div>
+  <div class="card" ng-repeat="list in geoLists">
+    <div class="item item-divider">
+      {{ list.name }}
+    </div>
+    <!-- <div ng-repeat="task in filteredtasks = (tasks | filter: {task.geoList: list})"> -->
+    <div ng-repeat="task in tasks">
+      <div class="item item-input">
+        <div>
+          <a class="button button-icon icon super-ios-circle-outline" ng-click="congratsAlert(task)" ng-if="!task.done"></a>
+          <a class="button button-icon icon super-checkmark-circled" ng-click="congratsAlert(task)" ng-if="task.done"></a>
+        </div>
 
-      <div class="col col-65">
-          <input type="text" ng-model="task.name" placeholder="Enter task" ng-if="task.editing">
-          <p ng-if="!task.editing">{{ task.name }}</p>
-      </div>
+        <div class="col col-65">
+            <input type="text" ng-model="task.name" placeholder="Enter task" ng-if="task.editing">
+            <p ng-if="!task.editing">{{ task.name }}</p>
+        </div>
 
-      <div class="col col-25">
-        <a class="button button-small button-icon icon super-ios-close" ng-if="!task.editing" ng-click="deleteTask(task)"></a>
-        <a class="button button-small button-icon icon super-edit" ng-if="!task.editing" ng-click="editTask(task)"></a>
+        <div class="col col-25">
+          <a class="button button-small button-icon icon super-ios-close" ng-if="!task.editing" ng-click="deleteTask(task)"></a>
+          <a class="button button-small button-icon icon super-edit" ng-if="!task.editing" ng-click="editTask(task)"></a>
 
-        <a class="button button-small button-icon icon super-ios-close" ng-if="task.editing" ng-click="discardEdits(task)"></a>
-        <a class="button button-small button-icon icon super-checkmark-circled" ng-if="task.editing" ng-click="saveTask(task)"></a>
+          <a class="button button-small button-icon icon super-ios-close" ng-if="task.editing" ng-click="discardEdits(task)"></a>
+          <a class="button button-small button-icon icon super-checkmark-circled" ng-if="task.editing" ng-click="saveTask(task)"></a>
+        </div>
       </div>
     </div>
-  </div>
 
-  <button class="button button-block button-positive" ng-click="addTask()">
-    Add Item
-  </button>
-
-  <super-navigate location="xlist#location">
-    <button class="button button-block button-positive">
-      Add Location
+    <button class="button button-block button-positive" ng-click="addTask()">
+      Add Item
     </button>
-  </super-navigate>
 
+    <super-navigate location="xlist#location" data-params-id="{{ task.geoList }}" >
+      <button class="button button-block button-positive">
+        Add Location
+      </button>
+    </super-navigate>
+
+  </div>
   <button class="button button-block button-positive" ng-click="setLocation()">Set Location</button>
+
 </div>

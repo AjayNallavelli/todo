@@ -71,10 +71,12 @@ angular
     supersonic.device.buttons.back.whenPressed(back);
 
     var getGeoList = function() {
-      var queryGeoLists = new Parse.Query(GeoList);
-      queryGeoLists.find().then(function(geoLists) {
-        geoList = geoLists[0];
-        setLocation(geoList.get('location'));
+      supersonic.ui.views.current.params.onValue(function(params) {
+        var queryGeoLists = new Parse.Query(GeoList);
+        queryGeoLists.get(params.id).then(function(result) {
+          geoList = result;
+          setLocation(geoList.get('location'));
+        });
       });
     };
 
