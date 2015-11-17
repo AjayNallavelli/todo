@@ -212,9 +212,18 @@ angular
         .then(function(results) {
           if (task.done) {
             var options = {
-              message: 'You finished a task!',
-              buttonLabel: 'Close'
+              message: '',
+              buttonLabel: ''
             };
+
+            if (_allTasksDone()) {
+              options.message = 'You\'ve finished all your tasks!';
+              options.buttonLabel = 'Hooray!';
+            } else {
+              options.message = 'You finished a task!';
+              options.buttonLabel = 'Yay!';
+            }
+
             supersonic.ui.dialog.alert('Congratulations!', options);
           }
           getTasks();
@@ -222,6 +231,15 @@ angular
           supersonic.ui.dialog.alert(
               'Error: ' + error.code + ' ' + error.message);
         });
+    };
+
+    var _allTasksDone = function() {
+      for(var task in $scope.tasks) {
+        if(!$scope.tasks[task].done) {
+          return false;
+        }
+      }
+      return true;
     };
 
     supersonic.ui.views.current.whenVisible(getTasks);
