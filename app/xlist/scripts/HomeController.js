@@ -234,8 +234,8 @@ angular
     };
 
     var _allTasksDone = function() {
-      for(var task in $scope.tasks) {
-        if(!$scope.tasks[task].done) {
+      for (var task in $scope.tasks) {
+        if (!$scope.tasks[task].done) {
           return false;
         }
       }
