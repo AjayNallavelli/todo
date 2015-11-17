@@ -145,6 +145,21 @@ angular
       $scope.tasks.push(newTask);
     };
 
+    var _focusIngredient = function(field, index) {
+      var ingredient = index === 'new' ? $scope.newIngredient :
+          $scope.ingredients[index];
+      field = ingredient.quantity === undefined ? 'ingredient' : field;
+      var element = document.getElementById(field + '-' + index.toString());
+      element.focus();
+    };
+
+    $scope.taskEnter = function(event, index) {
+      if (event.which === 13) {
+        $scope.saveTask($scope.tasks[index]);
+        document.getElementById('task-' + index.toString()).blur();
+      }
+    };
+
     $scope.deleteTask = function(task) {
       var options = {
         message: 'Are you sure you wish to delete this task?',

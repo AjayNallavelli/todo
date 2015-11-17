@@ -11,17 +11,17 @@
         <a class="button button-icon icon super-checkmark-circled" ng-click="congratsAlert(task)" ng-if="task.done"></a>
       </div>
 
-      <div class="task-list col col-65">
-          <textarea ng-model="task.name" placeholder="Enter task" ng-if="task.editing"></textarea>
-          <p ng-if="!task.editing">{{ task.name }}</p>
+      <div class="task-list col col-75">
+          <textarea ng-model="task.name" placeholder="Enter task" ng-attr-id="task-{{ $index }}" ng-keypress="taskEnter($event, $index)"></textarea>
+          <!-- <p ng-if="!task.editing">{{ task.name }}</p> -->
       </div>
 
-      <div class="col col-25">
-        <a class="button button-small button-icon icon super-ios-close" ng-if="!task.editing" ng-click="deleteTask(task)"></a>
-        <a class="button button-small button-icon icon super-edit" ng-if="!task.editing" ng-click="editTask(task)"></a>
+      <div class="col col-10">
+        <a class="button button-small button-icon icon super-ios-close" ng-click="deleteTask(task)"></a>
+        <!-- <a class="button button-small button-icon icon super-edit" ng-if="!task.editing" ng-click="editTask(task)"></a> -->
 
-        <a class="button button-small button-icon icon super-ios-close" ng-if="task.editing" ng-click="discardEdits(task)"></a>
-        <a class="button button-small button-icon icon super-checkmark-circled" ng-if="task.editing" ng-click="saveTask(task)"></a>
+        <!-- <a class="button button-small button-icon icon super-ios-close" ng-if="task.editing" ng-click="discardEdits(task)"></a> -->
+        <!-- <a class="button button-small button-icon icon super-checkmark-circled" ng-if="task.editing" ng-click="saveTask(task)"></a> -->
       </div>
     </div>
   </div>
