@@ -138,6 +138,7 @@ angular
 
     $scope.addTask = function() {
       var newTask = new ParseObject(new Task(), fields);
+      newTask.name = '';
       newTask.category = '';
       newTask.done = false;
       newTask.editing = true;
@@ -155,7 +156,7 @@ angular
 
     $scope.taskEnter = function(event, index) {
       if (event.which === 13) {
-        $scope.saveTask($scope.tasks[index]);
+        $scope.saveTask($scope.tasks[index], index);
         document.getElementById('task-' + index.toString()).blur();
       }
     };
@@ -194,16 +195,25 @@ angular
         });
     };
 
-    $scope.saveTask = function(task) {
-      task.done = false;
+    $scope.saveTask = function(task, index) {
+      task.name = task.name.trim();
+      if (task.name != '') {
+        task.done = false;
 
-      task.save()
-        .then(function(results) {
-          task.editing = false;
-        }, function(error) {
-          supersonic.ui.dialog.alert(
-              'Error: ' + error.code + ' ' + error.message);
-        });
+        task.save()
+          .then(function(results) {
+            task.editing = false;
+          }, function(error) {
+            supersonic.ui.dialog.alert(
+                'Error: ' + error.code + ' ' + error.message);
+          });
+      } else {
+        if (index == $scope.tasks.length - 1) {
+          $scope.tasks.splice(index, 1);
+        } else {
+          $scope.deleteTask(task);
+        }
+      }
     };
 
     $scope.congratsAlert = function(task) {
