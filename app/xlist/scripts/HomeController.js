@@ -82,7 +82,7 @@ angular
     var findNear = function(location) {
       for (var i = 0; i < $scope.geoLists.length; i++) {
         var geoList = $scope.geoLists[i];
-        var distance = getDistance(location, geoList.get('location'));
+        var distance = getDistance(location, geoList.location);
         if (distance < THRESHOLD) {
           pushNear(geoList);
         }

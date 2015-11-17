@@ -3,12 +3,11 @@
     <super-navbar-title>ToDo</super-navbar-title>
   </super-navbar>
 
-  <div class="card" ng-repeat="list in geoLists">
+  <div class="card" ng-repeat="geoList in geoLists">
     <div class="item item-divider">
-      {{ list.name }}
+      {{ geoList.geoList.name }}
     </div>
-    <!-- <div ng-repeat="task in filteredtasks = (tasks | filter: {task.geoList: list})"> -->
-    <div ng-repeat="task in tasks">
+    <div ng-repeat="task in geoList.tasks">
       <div class="item item-input">
         <div>
           <a class="button button-icon icon super-ios-circle-outline" ng-click="congratsAlert(task)" ng-if="!task.done"></a>
@@ -34,7 +33,7 @@
       Add Item
     </button>
 
-    <super-navigate location="xlist#location" data-params-id="{{ task.geoList }}" >
+    <super-navigate location="xlist#location" data-params-id="{{ geoList.geoList.data.id }}" >
       <button class="button button-block button-positive">
         Add Location
       </button>
