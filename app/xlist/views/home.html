@@ -26,9 +26,8 @@
     </div>
   </div>
 
-  <button class="button button-block button-positive" ng-click="addTask()">
-    Add Item
-  </button>
+  <button class="button button-block button-positive" ng-if="!disableAdd" ng-click="addTask()">Add Item</button>
+  <button class="button button-block button-light" ng-if="disableAdd">Add Item</button>
 
   <super-navigate location="xlist#location">
     <button class="button button-block button-positive">

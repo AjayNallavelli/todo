@@ -6,6 +6,7 @@ angular
   function($scope, $q, supersonic, Task, deviceReady, slackbot, push,
            ParseObject, ParseQuery) {
     $scope.tasks = [];
+    $scope.disableAdd = false;
     var fields = ['name', 'done', 'category', 'deadline'];
 
     var overrideLocation = null;
@@ -144,6 +145,7 @@ angular
       newTask.editing = true;
 
       $scope.tasks.push(newTask);
+      $scope.disableAdd = true;
     };
 
     var _focusIngredient = function(field, index) {
@@ -197,7 +199,7 @@ angular
 
     $scope.saveTask = function(task, index) {
       task.name = task.name.trim();
-      if (task.name != '') {
+      if (task.name !== '') {
         task.done = false;
 
         task.save()
@@ -214,6 +216,8 @@ angular
           $scope.deleteTask(task);
         }
       }
+
+      $scope.disableAdd = false;
     };
 
     $scope.congratsAlert = function(task) {
