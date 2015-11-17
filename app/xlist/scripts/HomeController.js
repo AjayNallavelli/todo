@@ -130,10 +130,6 @@ angular
           });
         });
       });
-
-      queryGeoLists.find().then(function(results) {
-        $scope.geoLists = results;
-      });
     };
 
     $scope.addTask = function() {
