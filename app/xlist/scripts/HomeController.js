@@ -224,20 +224,11 @@ angular
       task.done = !task.done;
       task.save()
         .then(function(results) {
-          if (task.done) {
+          if (_allTasksDone()) {
             var options = {
-              message: '',
-              buttonLabel: ''
+              message: 'You\'ve finished all your tasks!',
+              buttonLabel: 'Hooray!'
             };
-
-            if (_allTasksDone()) {
-              options.message = 'You\'ve finished all your tasks!';
-              options.buttonLabel = 'Hooray!';
-            } else {
-              options.message = 'You finished a task!';
-              options.buttonLabel = 'Yay!';
-            }
-
             supersonic.ui.dialog.alert('Congratulations!', options);
           }
           getTasks();
