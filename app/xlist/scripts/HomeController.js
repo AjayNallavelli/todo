@@ -1,13 +1,13 @@
 angular
   .module('xlist')
   .controller('HomeController',
-      ['$scope', '$q', 'supersonic', 'Task', 'deviceReady', 'slackbot',
-       'push', 'ParseObject', 'ParseQuery',
-  function($scope, $q, supersonic, Task, deviceReady, slackbot, push,
+      ['$scope', '$q', 'supersonic', 'GeoList', 'Task', 'deviceReady',
+       'slackbot', 'push', 'ParseObject', 'ParseQuery',
+  function($scope, $q, supersonic, GeoList, Task, deviceReady, slackbot, push,
            ParseObject, ParseQuery) {
     $scope.tasks = [];
-    var fields = ['name', 'done', 'category', 'deadline'];
 
+    var geoLists = [];
     var overrideLocation = null;
 
     // Haversine formula for getting distance in miles.
@@ -24,42 +24,21 @@ angular
       return 1609 * d; // Returns the distance in miles.
     };
 
-    var makeCoords = function(latitude, longitude) {
-      return {latitude: latitude, longitude: longitude};
-    };
-
-    var presetLocations = {
-      'wholefoods': makeCoords(42.046858, -87.679596),
-      'slivka': makeCoords(42.060487, -87.675712),
-      'ford': makeCoords(42.056924, -87.676544),
-      'tech': makeCoords(42.057488, -87.675817)
-    };
-
-    var presetTasks = {
-      'wholefoods': 'Buy milk.',
-      'slivka': 'Do laundry.',
-      'ford': 'Return the hot glue gun.',
-      'tech': 'Turn in homework.'
-    };
-
-    var waitUntil = {
-      'wholefoods': 0,
-      'slivka': 0,
-      'ford': 0,
-      'tech': 0
-    };
-
     $scope.setLocation = function() {
-      var presets = [];
-      for (var preset in presetLocations) {
-        presets.push(preset);
-      }
-      console.log(presets);
-      supersonic.ui.dialog.confirm('Set Location', {
-        message: 'Choose one of the following preset locations.',
-        buttonLabels: presets
-      }).then(function(buttonIndex) {
-        overrideLocation = presetLocations[presets[buttonIndex]];
+      supersonic.ui.dialog.prompt('Set Location', {
+        message: 'Which list\'s location should the location be overridden by?',
+      }).then(function(result) {
+        if (result.buttonIndex === 0) {
+          for (var i = 0; i < geoLists.length; i++) {
+            var geoList = geoLists[i];
+            if (geoList.get('name').toLowerCase() ===
+                result.input.toLowerCase()) {
+              overrideLocation = geoList.get('location');
+              console.log(overrideLocation);
+              break;
+            }
+          }
+        }
       });
     };
 
@@ -79,24 +58,33 @@ angular
       return deferred.promise;
     };
 
+    var pushNear = function(geoList) {
+      var now = new Date().getTime();
+      var nextNotification = geoList.get('nextNotification');
+      if (!nextNotification || now > nextNotification) {
+        geoList.set('nextNotification', now + 1000 * 90);
+        geoList.save();
+        var incomplete = _.filter($scope.tasks, function(task) {
+          return !task.done;
+        }).length;
+        var message = 'Pick up ' + incomplete + ' items at ' +
+            geoList.get('name') + '.';
+        push.send({
+          title: 'ToDo',
+          message: message
+        });
+        slackbot('ToDo: ' + message);
+      }
+    };
+
     var THRESHOLD = 50;
 
     var findNear = function(location) {
-      var slackbotNear = function(preset) {
-        var now = new Date().getTime();
-        if (now > waitUntil[preset]) {
-          waitUntil[preset] = now + 1000 * 90;
-          push.send({
-            title: 'You are near ' + preset + '.',
-            message: presetTasks[preset]
-          });
-          slackbot('You are near ' + preset + '. ' + presetTasks[preset]);
-        }
-      };
-      for (var preset in presetLocations) {
-        var distance = getDistance(location, presetLocations[preset]);
+      for (var i = 0; i < geoLists.length; i++) {
+        var geoList = geoLists[i];
+        var distance = getDistance(location, geoList.get('location'));
         if (distance < THRESHOLD) {
-          deviceReady().then(_.partial(slackbotNear, preset));
+          pushNear(geoList);
         }
       }
     };
@@ -114,30 +102,31 @@ angular
       }, 10 * 1000);
     });
 
-    // supersonic.device.push.foregroundNotifications().onValue(
-    //     function(notification) {
-    //       supersonic.ui.dialog.alert('Push Notification', {
-    //         message: JSON.stringify(notification)
-    //       });
-    //     });
-
     var getTasks = function() {
-      var query = new Parse.Query(Task);
-      ParseQuery(query, {functionToCall: 'find'})
-        .then(function(results) {
-          $scope.tasks = [];
-          for (var i = 0; i < results.length; i++) {
-            $scope.tasks.push(new ParseObject(results[i], fields));
-            $scope.tasks[i].editing = false;
-          }
-        }, function(error) {
-          supersonic.ui.dialog.alert(
-            'Error: ' + error.code + ' ' + error.message);
-        });
+      var queryTasks = new Parse.Query(Task);
+      ParseQuery(queryTasks, {functionToCall: 'find'})
+          .then(function(results) {
+            $scope.tasks = [];
+            for (var i = 0; i < results.length; i++) {
+              $scope.tasks.push(new ParseObject(results[i], Task.fields));
+              $scope.tasks[i].editing = false;
+            }
+          }, function(error) {
+            supersonic.ui.dialog.alert(
+              'Error: ' + error.code + ' ' + error.message);
+          });
+    };
+
+    var initialize = function() {
+      getTasks();
+      var queryGeoLists = new Parse.Query(GeoList);
+      queryGeoLists.find().then(function(results) {
+        geoLists = results;
+      });
     };
 
     $scope.addTask = function() {
-      var newTask = new ParseObject(new Task(), fields);
+      var newTask = new ParseObject(new Task(), Task.fields);
       newTask.category = '';
       newTask.done = false;
       newTask.editing = true;
@@ -219,5 +208,5 @@ angular
         });
     };
 
-    supersonic.ui.views.current.whenVisible(getTasks);
+    supersonic.ui.views.current.whenVisible(initialize);
   }]);

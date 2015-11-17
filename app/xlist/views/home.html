@@ -1,7 +1,6 @@
 <div ng-controller="HomeController">
   <super-navbar>
     <super-navbar-title>ToDo</super-navbar-title>
-    <super-navbar-button ng-click="setLocation()">Set Location</super-navbar-button>
   </super-navbar>
 
   <div ng-repeat="task in tasks">
@@ -35,4 +34,6 @@
       Add Location
     </button>
   </super-navigate>
+
+  <button class="button button-block button-positive" ng-click="setLocation()">Set Location</button>
 </div>
