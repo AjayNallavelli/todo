@@ -161,23 +161,13 @@ angular
     };
 
     $scope.deleteTask = function(task) {
-      var options = {
-        message: 'Are you sure you wish to delete this task?',
-        buttonLabels: ['Yes', 'No']
-      };
-
-      supersonic.ui.dialog.confirm('Confirm', options)
-        .then(function(index) {
-          if (index === 0) {
-            task.delete()
-              .then(function(result) {
-                getTasks();
-              }, function(error) {
-                supersonic.ui.dialog.alert(
-                  'Error: ' + error.code + ' ' + error.message);
-              });
-          }
-        });
+      task.delete()
+      .then(function(result) {
+        getTasks();
+      }, function(error) {
+        supersonic.ui.dialog.alert(
+          'Error: ' + error.code + ' ' + error.message);
+      });
     };
 
     $scope.editTask = function(task) {
