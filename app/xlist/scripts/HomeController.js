@@ -6,6 +6,8 @@ angular
   function($scope, $q, supersonic, GeoList, Task, deviceReady, slackbot, push,
            ParseObject) {
     $scope.pairs = [];
+    $scope.disableAdd = false;
+    var fields = ['name', 'done', 'category', 'deadline'];
     var overrideLocation = null;
 
     // Haversine formula for getting distance in miles.
@@ -82,7 +84,7 @@ angular
       }
     };
 
-    var THRESHOLD = 50;
+    var THRESHOLD = 0.25;
 
     var findNear = function(location) {
       _.each($scope.pairs, function(pair) {
@@ -106,6 +108,10 @@ angular
       }, 10 * 1000);
     });
 
+    var alertParseError = function(error) {
+      supersonic.ui.dialog.alert('Error: ' + error.code + ' ' + error.message);
+    };
+
     var getTasks = function(geoList) {
       var deferred = $q.defer();
       var queryTasks = new Parse.Query(Task);
@@ -117,111 +123,97 @@ angular
               tasks[i].editing = false;
             }
             deferred.resolve(tasks);
-          }, function(error) {
-            supersonic.ui.dialog.alert(
-              'Error: ' + error.code + ' ' + error.message);
-          });
+          }, alertParseError);
       return deferred.promise;
     };
 
     var initialize = function() {
       var newPairs = [];
       var queryGeoLists = new Parse.Query(GeoList);
-      queryGeoLists.addAscending('name').find(function(geoLists) {
-        _.each(geoLists, function(geoList) {
-          getTasks(geoList).then(function(tasks) {
-            newPairs.push({
-              geoList: new ParseObject(geoList, GeoList.fields),
-              tasks: tasks
-            });
+      queryGeoLists.each(function(geoList) {
+        return getTasks(geoList).then(function(tasks) {
+          newPairs.push({
+            geoList: new ParseObject(geoList, GeoList.fields),
+            tasks: tasks
           });
         });
       }).then(function() {
-        $scope.pairs = newPairs;
+        $scope.pairs = _.sortBy(newPairs, function(pair) {
+          return pair.geoList.name;
+        });
       });
     };
 
-    $scope.addTask = function() {
+    $scope.addTask = function(pair) {
       var newTask = new ParseObject(new Task(), Task.fields);
+      newTask.name = '';
       newTask.category = '';
       newTask.done = false;
-      newTask.editing = true;
-
-      $scope.tasks.push(newTask);
+      newTask.geoList = pair.geoList.data.toPointer();
+      pair.tasks.push(newTask);
+      $scope.disableAdd = true;
     };
 
-    $scope.deleteTask = function(task) {
-      var options = {
-        message: 'Are you sure you wish to delete this task?',
-        buttonLabels: ['Yes', 'No']
-      };
+    var saveTask = function(pair, index, taskContent) {
+      var task = pair.tasks[index];
+      task.name = (taskContent || task.name).trim();
+      if (task.name.length) {
+        task.done = false;
+        task.save().catch(alertParseError);
+      } else {
+        $scope.deleteTask(pair, index);
+      }
+      $scope.disableAdd = false;
+    };
 
-      supersonic.ui.dialog.confirm('Confim', options)
-        .then(function(index) {
-          if (index === 0) {
-            task.delete()
-              .then(function(result) {
-                getTasks();
-              }, function(error) {
-                supersonic.ui.dialog.alert(
-                  'Error: ' + error.code + ' ' + error.message);
-              });
+    $scope.taskEnter = function(event, pair, index) {
+      if (event.which === 13) {
+        event.preventDefault();
+        var taskElement = document.getElementById(
+            'task-' + pair.geoList.data.id + '-' + index.toString());
+        var taskContent = taskElement.innerText;
+        saveTask(pair, index, taskContent);
+        taskElement.innerText = taskContent;
+        taskElement.blur();
+      }
+    };
+
+    $scope.deleteTask = function(pair, index) {
+      if (index == pair.tasks.length - 1 && $scope.disableAdd) {
+        pair.tasks.splice(index, 1);
+        $scope.disableAdd = false;
+      } else {
+        pair.tasks[index].delete().then(function(result) {
+          pair.tasks.splice(index, 1);
+          if (pair.tasks.length === 0) {
+            congratsAlert();
           }
-        });
+        }, alertParseError);
+      }
     };
 
-    $scope.editTask = function(task) {
-      task.editing = true;
-    };
-
-    $scope.discardEdits = function(task) {
-      var options = {
-        message: 'Do you wish to discard changes?',
-        buttonLabels: ['Yes', 'No']
-      };
-
-      supersonic.ui.dialog.confirm('Confim', options)
-        .then(function(index) {
-          if (index === 0) {
-            task.fetch()
-              .then(function() {
-                task.editing = false;
-              }, function(error) {
-                supersonic.ui.dialog.alert(
-                  'Error: ' + error.code + ' ' + error.message);
-              });
-          }
-        });
-    };
-
-    $scope.saveTask = function(task) {
-      task.done = false;
-
-      task.save()
-        .then(function(results) {
-          task.editing = false;
-        }, function(error) {
-          supersonic.ui.dialog.alert(
-              'Error: ' + error.code + ' ' + error.message);
-        });
-    };
-
-    $scope.congratsAlert = function(task) {
+    $scope.toggleTask = function(pair, task) {
       task.done = !task.done;
       task.save()
         .then(function(results) {
-          if (task.done) {
-            var options = {
-              message: 'You finished a task!',
-              buttonLabel: 'Close'
-            };
-            supersonic.ui.dialog.alert('Congratulations!', options);
+          if (allTasksDone(pair)) {
+            congratsAlert();
           }
-          getTasks();
-        }, function(error) {
-          supersonic.ui.dialog.alert(
-              'Error: ' + error.code + ' ' + error.message);
-        });
+        }, alertParseError);
+    };
+
+    var congratsAlert = function() {
+      var options = {
+        message: 'You\'ve finished all your tasks!',
+        buttonLabel: 'Hooray!'
+      };
+      supersonic.ui.dialog.alert('Congratulations!', options);
+    };
+
+    var allTasksDone = function(pair) {
+      return _.every(pair.tasks, function(task) {
+        return task.done;
+      });
     };
 
     supersonic.ui.views.current.whenVisible(initialize);
