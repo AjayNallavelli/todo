@@ -4,7 +4,8 @@
   </super-navbar>
 
   <div class="card" ng-repeat="geoList in geoLists">
-    <div class="item item-divider">
+    <div class="item item-divider" >
+    <i class="icon super-location"></i>
       {{ geoList.geoList.name }}
     </div>
     <div ng-repeat="task in geoList.tasks">
