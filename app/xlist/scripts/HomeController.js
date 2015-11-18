@@ -7,7 +7,7 @@ angular
            ParseObject, ParseQuery) {
     // $scope.taskLists = [];
 
-    $scope.geoLists = [];
+    $scope.pairs = [];
     var overrideLocation = null;
 
     // Haversine formula for getting distance in miles.
@@ -29,14 +29,12 @@ angular
         message: 'Which list\'s location should the location be overridden by?',
       }).then(function(result) {
         if (result.buttonIndex === 0) {
-          for (var i = 0; i < $scope.geoLists.length; i++) {
-            var geoList = $scope.geoLists[i];
-            if (geoList.get('name').toLowerCase() ===
-                result.input.toLowerCase()) {
-              overrideLocation = geoList.get('location');
-              console.log(overrideLocation);
-              break;
-            }
+          var pair = _.find($scope.pairs, function(pair) {
+            return pair.geoList.name.toLowerCase() ===
+                result.input.toLowerCase();
+          });
+          if (pair) {
+            overrideLocation = pair.geoList.location;
           }
         }
       });
@@ -60,33 +58,34 @@ angular
 
     var pushNear = function(geoList) {
       var now = new Date().getTime();
-      var nextNotification = geoList.get('nextNotification');
+      var nextNotification = geoList.nextNotification;
       if (!nextNotification || now > nextNotification) {
-        geoList.set('nextNotification', now + 1000 * 90);
+        geoList.nextNotification = now + 1000 * 90;
         geoList.save();
         var incomplete = _.filter($scope.tasks, function(task) {
           return !task.done;
         }).length;
-        var message = 'Pick up ' + incomplete + ' items at ' +
-            geoList.get('name') + '.';
-        push.send({
-          title: 'ToDo',
-          message: message
-        });
-        slackbot('ToDo: ' + message);
+        if (incomplete) {
+          var message = 'Pick up ' + incomplete + ' items at ' +
+              geoList.get('name') + '.';
+          push.send({
+            title: 'ToDo',
+            message: message
+          });
+          slackbot('ToDo: ' + message);
+        }
       }
     };
 
     var THRESHOLD = 50;
 
     var findNear = function(location) {
-      for (var i = 0; i < $scope.geoLists.length; i++) {
-        var geoList = $scope.geoLists[i];
-        var distance = getDistance(location, geoList.location);
+      _.each($scope.pairs, function(pair) {
+        var distance = getDistance(location, pair.geoList.location);
         if (distance < THRESHOLD) {
-          pushNear(geoList);
+          pushNear(pair.geoList);
         }
-      }
+      });
     };
 
     deviceReady().then(function() {
@@ -121,17 +120,17 @@ angular
     };
 
     var initialize = function() {
-      var newGeoLists = [];
+      var newPairs = [];
       var queryGeoLists = new Parse.Query(GeoList);
       queryGeoLists.each(function(geoList) {
         getTasks(geoList).then(function(tasks) {
-          newGeoLists.push({
+          newPairs.push({
             geoList: new ParseObject(geoList, GeoList.fields),
             tasks: tasks
           });
         });
       }).then(function() {
-        $scope.geoLists = newGeoLists;
+        $scope.pairs = newPairs;
       });
     };
 
