@@ -142,7 +142,6 @@ angular
       newTask.name = '';
       newTask.category = '';
       newTask.done = false;
-      newTask.editing = true;
 
       $scope.tasks.push(newTask);
       $scope.disableAdd = true;
@@ -161,6 +160,7 @@ angular
         var taskElement = document.getElementById('task-' + index.toString());
         var taskContent = taskElement.innerText;
         $scope.saveTask($scope.tasks[index], index, taskContent);
+        taskElement.innerText = taskContent;
         taskElement.blur();
       }
     };
@@ -175,10 +175,6 @@ angular
       });
     };
 
-    $scope.editTask = function(task) {
-      task.editing = true;
-    };
-
     $scope.discardEdits = function(task) {
       var options = {
         message: 'Do you wish to discard changes?',
@@ -190,7 +186,6 @@ angular
           if (index === 0) {
             task.fetch()
               .then(function() {
-                task.editing = false;
               }, function(error) {
                 supersonic.ui.dialog.alert(
                   'Error: ' + error.code + ' ' + error.message);
@@ -200,8 +195,8 @@ angular
     };
 
     $scope.saveTask = function(task, index, taskContent) {
-      if (!(taskContent == undefined)) {
-        task.name = taskContent; 
+      if (taskContent !== undefined) {
+        task.name = taskContent;
       }
       task.name = task.name.trim();
       if (task.name !== '') {
@@ -209,7 +204,6 @@ angular
 
         task.save()
           .then(function(results) {
-            task.editing = false;
           }, function(error) {
             supersonic.ui.dialog.alert(
                 'Error: ' + error.code + ' ' + error.message);
@@ -221,7 +215,6 @@ angular
           $scope.deleteTask(task);
         }
       }
-
       $scope.disableAdd = false;
     };
 
