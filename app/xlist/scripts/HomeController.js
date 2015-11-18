@@ -26,7 +26,7 @@ angular
 
     $scope.setLocation = function() {
       supersonic.ui.dialog.prompt('Set Location', {
-        message: 'Which list\'s location should the location be overridden by?'
+        message: 'Enter the name of list whose location you want to simulate'
       }).then(function(result) {
         if (result.buttonIndex === 0) {
           var pair = _.find($scope.pairs, function(pair) {
