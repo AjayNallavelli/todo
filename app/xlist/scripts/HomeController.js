@@ -2,11 +2,9 @@ angular
   .module('xlist')
   .controller('HomeController',
       ['$scope', '$q', 'supersonic', 'GeoList', 'Task', 'deviceReady',
-       'slackbot', 'push', 'ParseObject', 'ParseQuery',
+       'slackbot', 'push', 'ParseObject',
   function($scope, $q, supersonic, GeoList, Task, deviceReady, slackbot, push,
-           ParseObject, ParseQuery) {
-    // $scope.taskLists = [];
-
+           ParseObject) {
     $scope.pairs = [];
     var overrideLocation = null;
 
@@ -26,7 +24,7 @@ angular
 
     $scope.setLocation = function() {
       supersonic.ui.dialog.prompt('Set Location', {
-        message: 'Which list\'s location should the location be overridden by?',
+        message: 'Which list\'s location should the location be overridden by?'
       }).then(function(result) {
         if (result.buttonIndex === 0) {
           var pair = _.find($scope.pairs, function(pair) {
@@ -35,6 +33,13 @@ angular
           });
           if (pair) {
             overrideLocation = pair.geoList.location;
+            supersonic.ui.dialog.alert('Set Location', {
+              message: 'Location set to location of ' + pair.geoList.name + '.'
+            });
+          } else {
+            supersonic.ui.dialog.alert('Set Location', {
+              message: 'No such list found.'
+            });
           }
         }
       });
@@ -56,18 +61,18 @@ angular
       return deferred.promise;
     };
 
-    var pushNear = function(geoList) {
+    var pushNear = function(pair) {
       var now = new Date().getTime();
-      var nextNotification = geoList.nextNotification;
+      var nextNotification = pair.geoList.nextNotification;
       if (!nextNotification || now > nextNotification) {
-        geoList.nextNotification = now + 1000 * 90;
-        geoList.save();
-        var incomplete = _.filter($scope.tasks, function(task) {
+        pair.geoList.nextNotification = now + 1000 * 90;
+        pair.geoList.save();
+        var incomplete = _.filter(pair.tasks, function(task) {
           return !task.done;
         }).length;
         if (incomplete) {
           var message = 'Pick up ' + incomplete + ' items at ' +
-              geoList.get('name') + '.';
+              pair.geoList.name + '.';
           push.send({
             title: 'ToDo',
             message: message
@@ -83,7 +88,7 @@ angular
       _.each($scope.pairs, function(pair) {
         var distance = getDistance(location, pair.geoList.location);
         if (distance < THRESHOLD) {
-          pushNear(pair.geoList);
+          pushNear(pair);
         }
       });
     };
@@ -122,11 +127,13 @@ angular
     var initialize = function() {
       var newPairs = [];
       var queryGeoLists = new Parse.Query(GeoList);
-      queryGeoLists.each(function(geoList) {
-        getTasks(geoList).then(function(tasks) {
-          newPairs.push({
-            geoList: new ParseObject(geoList, GeoList.fields),
-            tasks: tasks
+      queryGeoLists.addAscending('name').find(function(geoLists) {
+        _.each(geoLists, function(geoList) {
+          getTasks(geoList).then(function(tasks) {
+            newPairs.push({
+              geoList: new ParseObject(geoList, GeoList.fields),
+              tasks: tasks
+            });
           });
         });
       }).then(function() {
