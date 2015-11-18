@@ -165,14 +165,19 @@ angular
       }
     };
 
-    $scope.deleteTask = function(task) {
-      task.delete()
-      .then(function(result) {
-        getTasks();
-      }, function(error) {
-        supersonic.ui.dialog.alert(
-          'Error: ' + error.code + ' ' + error.message);
-      });
+    $scope.deleteTask = function(task, index) {
+      if (index == $scope.tasks.length - 1 && $scope.disableAdd) {
+        $scope.tasks.splice(index, 1);
+        $scope.disableAdd = false;
+      } else {
+        task.delete()
+        .then(function(result) {
+          $scope.tasks.splice(index, 1);
+        }, function(error) {
+          supersonic.ui.dialog.alert(
+            'Error: ' + error.code + ' ' + error.message);
+        });
+      }
     };
 
     $scope.discardEdits = function(task) {
@@ -209,11 +214,7 @@ angular
                 'Error: ' + error.code + ' ' + error.message);
           });
       } else {
-        if (index == $scope.tasks.length - 1) {
-          $scope.tasks.splice(index, 1);
-        } else {
-          $scope.deleteTask(task);
-        }
+        $scope.deleteTask(task, index);
       }
       $scope.disableAdd = false;
     };
