@@ -173,6 +173,9 @@ angular
         task.delete()
         .then(function(result) {
           $scope.tasks.splice(index, 1);
+          if ($scope.tasks.length == 0) {
+            congratsAlert();
+          }
         }, function(error) {
           supersonic.ui.dialog.alert(
             'Error: ' + error.code + ' ' + error.message);
@@ -219,22 +222,26 @@ angular
       $scope.disableAdd = false;
     };
 
-    $scope.congratsAlert = function(task) {
+    $scope.toggleTask = function(task) {
       task.done = !task.done;
       task.save()
         .then(function(results) {
           if (_allTasksDone()) {
-            var options = {
-              message: 'You\'ve finished all your tasks!',
-              buttonLabel: 'Hooray!'
-            };
-            supersonic.ui.dialog.alert('Congratulations!', options);
+            congratsAlert();
           }
           getTasks();
         }, function(error) {
           supersonic.ui.dialog.alert(
               'Error: ' + error.code + ' ' + error.message);
         });
+    };
+
+    var congratsAlert = function() {
+      var options = {
+        message: 'You\'ve finished all your tasks!',
+        buttonLabel: 'Hooray!'
+      };
+      supersonic.ui.dialog.alert('Congratulations!', options);
     };
 
     var _allTasksDone = function() {

@@ -7,8 +7,8 @@
   <div ng-repeat="task in tasks">
     <div class="item item-input">
       <div>
-        <a class="button button-icon icon super-ios-circle-outline" ng-click="congratsAlert(task)" ng-if="!task.done"></a>
-        <a class="button button-icon icon super-checkmark-circled" ng-click="congratsAlert(task)" ng-if="task.done"></a>
+        <a class="button button-icon icon super-ios-circle-outline" ng-click="toggleTask(task)" ng-if="!task.done"></a>
+        <a class="button button-icon icon super-checkmark-circled" ng-click="toggleTask(task)" ng-if="task.done"></a>
       </div>
 
       <div class="task-list col col-75">
