@@ -1,4 +1,8 @@
 angular
   .module('xlist')
-  .constant('Task', Parse.Object.extend('Task'))
-  .constant('GeoList', Parse.Object.extend('GeoList'));
+  .constant('Task', _.extend(
+      Parse.Object.extend('Task'),
+      {fields: ['name', 'done', 'geoList']}))
+  .constant('GeoList', _.extend(
+      Parse.Object.extend('GeoList'),
+      {fields: ['location', 'name', 'nextNotification']}));

@@ -22,9 +22,10 @@ angular
         id: 'id',
         coords: coords
       }];
-      $scope.map.center.latitude = coords.latitude;
-      $scope.map.center.longitude = coords.longitude;
-      console.log($scope.map);
+      $scope.$apply(function($scope) {
+        $scope.map.center.latitude = coords.latitude;
+        $scope.map.center.longitude = coords.longitude;
+      });
     };
 
     var placesChanged = function(searchBox) {
@@ -71,10 +72,16 @@ angular
     supersonic.device.buttons.back.whenPressed(back);
 
     var getGeoList = function() {
-      var queryGeoLists = new Parse.Query(GeoList);
-      queryGeoLists.find().then(function(geoLists) {
-        geoList = geoLists[0];
-        setLocation(geoList.get('location'));
+      supersonic.ui.views.current.params.onValue(function(params) {
+        var queryGeoLists = new Parse.Query(GeoList);
+        queryGeoLists.get(params.id).then(function(result) {
+          geoList = result;
+          var location = geoList.get('location');
+          setLocation({
+            latitude: location.latitude,
+            longitude: location.longitude
+          });
+        });
       });
     };
 

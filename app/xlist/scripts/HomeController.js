@@ -1,13 +1,13 @@
 angular
   .module('xlist')
   .controller('HomeController',
-      ['$scope', '$q', 'supersonic', 'Task', 'deviceReady', 'slackbot',
-       'push', 'ParseObject', 'ParseQuery',
-  function($scope, $q, supersonic, Task, deviceReady, slackbot, push,
-           ParseObject, ParseQuery) {
-    $scope.tasks = [];
+      ['$scope', '$q', 'supersonic', 'GeoList', 'Task', 'deviceReady',
+       'slackbot', 'push', 'ParseObject',
+  function($scope, $q, supersonic, GeoList, Task, deviceReady, slackbot, push,
+           ParseObject) {
+    $scope.pairs = [];
+    $scope.disableAdd = false;
     var fields = ['name', 'done', 'category', 'deadline'];
-
     var overrideLocation = null;
 
     // Haversine formula for getting distance in miles.
@@ -21,45 +21,29 @@ angular
           Math.sin(dLong / 2) * Math.sin(dLong / 2);
       var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
       var d = R * c; // d = distance in meters
-      return 1609 * d; // Returns the distance in miles.
-    };
-
-    var makeCoords = function(latitude, longitude) {
-      return {latitude: latitude, longitude: longitude};
-    };
-
-    var presetLocations = {
-      'wholefoods': makeCoords(42.046858, -87.679596),
-      'slivka': makeCoords(42.060487, -87.675712),
-      'ford': makeCoords(42.056924, -87.676544),
-      'tech': makeCoords(42.057488, -87.675817)
-    };
-
-    var presetTasks = {
-      'wholefoods': 'Buy milk.',
-      'slivka': 'Do laundry.',
-      'ford': 'Return the hot glue gun.',
-      'tech': 'Turn in homework.'
-    };
-
-    var waitUntil = {
-      'wholefoods': 0,
-      'slivka': 0,
-      'ford': 0,
-      'tech': 0
+      return d / 1609; // Returns the distance in miles.
     };
 
     $scope.setLocation = function() {
-      var presets = [];
-      for (var preset in presetLocations) {
-        presets.push(preset);
-      }
-      console.log(presets);
-      supersonic.ui.dialog.confirm('Set Location', {
-        message: 'Choose one of the following preset locations.',
-        buttonLabels: presets
-      }).then(function(buttonIndex) {
-        overrideLocation = presetLocations[presets[buttonIndex]];
+      supersonic.ui.dialog.prompt('Set Location', {
+        message: 'Which list\'s location should the location be overridden by?'
+      }).then(function(result) {
+        if (result.buttonIndex === 0) {
+          var pair = _.find($scope.pairs, function(pair) {
+            return pair.geoList.name.toLowerCase() ===
+                result.input.toLowerCase();
+          });
+          if (pair) {
+            overrideLocation = pair.geoList.location;
+            supersonic.ui.dialog.alert('Set Location', {
+              message: 'Location set to location of ' + pair.geoList.name + '.'
+            });
+          } else {
+            supersonic.ui.dialog.alert('Set Location', {
+              message: 'No such list found.'
+            });
+          }
+        }
       });
     };
 
@@ -79,26 +63,36 @@ angular
       return deferred.promise;
     };
 
-    var THRESHOLD = 50;
-
-    var findNear = function(location) {
-      var slackbotNear = function(preset) {
-        var now = new Date().getTime();
-        if (now > waitUntil[preset]) {
-          waitUntil[preset] = now + 1000 * 90;
+    var pushNear = function(pair) {
+      var now = new Date().getTime();
+      var nextNotification = pair.geoList.nextNotification;
+      if (!nextNotification || now > nextNotification) {
+        pair.geoList.nextNotification = now + 1000 * 90;
+        pair.geoList.save();
+        var incomplete = _.filter(pair.tasks, function(task) {
+          return !task.done;
+        }).length;
+        if (incomplete) {
+          var message = 'Pick up ' + incomplete + ' item' +
+              (incomplete > 1 ? 's' : '') + ' at ' + pair.geoList.name + '.';
           push.send({
-            title: 'You are near ' + preset + '.',
-            message: presetTasks[preset]
+            title: 'ToDo',
+            message: message
           });
-          slackbot('You are near ' + preset + '. ' + presetTasks[preset]);
-        }
-      };
-      for (var preset in presetLocations) {
-        var distance = getDistance(location, presetLocations[preset]);
-        if (distance < THRESHOLD) {
-          deviceReady().then(_.partial(slackbotNear, preset));
+          slackbot('ToDo: ' + message);
         }
       }
+    };
+
+    var THRESHOLD = 0.25;
+
+    var findNear = function(location) {
+      _.each($scope.pairs, function(pair) {
+        var distance = getDistance(location, pair.geoList.location);
+        if (distance < THRESHOLD) {
+          pushNear(pair);
+        }
+      });
     };
 
     deviceReady().then(function() {
@@ -114,110 +108,113 @@ angular
       }, 10 * 1000);
     });
 
-    // supersonic.device.push.foregroundNotifications().onValue(
-    //     function(notification) {
-    //       supersonic.ui.dialog.alert('Push Notification', {
-    //         message: JSON.stringify(notification)
-    //       });
-    //     });
-
-    var getTasks = function() {
-      var query = new Parse.Query(Task);
-      ParseQuery(query, {functionToCall: 'find'})
-        .then(function(results) {
-          $scope.tasks = [];
-          for (var i = 0; i < results.length; i++) {
-            $scope.tasks.push(new ParseObject(results[i], fields));
-            $scope.tasks[i].editing = false;
-          }
-        }, function(error) {
-          supersonic.ui.dialog.alert(
-            'Error: ' + error.code + ' ' + error.message);
-        });
+    var alertParseError = function(error) {
+      supersonic.ui.dialog.alert('Error: ' + error.code + ' ' + error.message);
     };
 
-    $scope.addTask = function() {
-      var newTask = new ParseObject(new Task(), fields);
+    var getTasks = function(geoList) {
+      var deferred = $q.defer();
+      var queryTasks = new Parse.Query(Task);
+      queryTasks.equalTo('geoList', geoList.toPointer()).find()
+          .then(function(results) {
+            var tasks = [];
+            for (var i = 0; i < results.length; i++) {
+              tasks.push(new ParseObject(results[i], Task.fields));
+              tasks[i].editing = false;
+            }
+            deferred.resolve(tasks);
+          }, alertParseError);
+      return deferred.promise;
+    };
+
+    var initialize = function() {
+      var newPairs = [];
+      var queryGeoLists = new Parse.Query(GeoList);
+      queryGeoLists.each(function(geoList) {
+        return getTasks(geoList).then(function(tasks) {
+          newPairs.push({
+            geoList: new ParseObject(geoList, GeoList.fields),
+            tasks: tasks
+          });
+        });
+      }).then(function() {
+        $scope.pairs = _.sortBy(newPairs, function(pair) {
+          return pair.geoList.name;
+        });
+      });
+    };
+
+    $scope.addTask = function(pair) {
+      var newTask = new ParseObject(new Task(), Task.fields);
+      newTask.name = '';
       newTask.category = '';
       newTask.done = false;
-      newTask.editing = true;
-
-      $scope.tasks.push(newTask);
+      newTask.geoList = pair.geoList.data.toPointer();
+      pair.tasks.push(newTask);
+      $scope.disableAdd = true;
     };
 
-    $scope.deleteTask = function(task) {
-      var options = {
-        message: 'Are you sure you wish to delete this task?',
-        buttonLabels: ['Yes', 'No']
-      };
+    var saveTask = function(pair, index, taskContent) {
+      var task = pair.tasks[index];
+      task.name = (taskContent || task.name).trim();
+      if (task.name.length) {
+        task.done = false;
+        task.save().catch(alertParseError);
+      } else {
+        $scope.deleteTask(pair, index);
+      }
+      $scope.disableAdd = false;
+    };
 
-      supersonic.ui.dialog.confirm('Confim', options)
-        .then(function(index) {
-          if (index === 0) {
-            task.delete()
-              .then(function(result) {
-                getTasks();
-              }, function(error) {
-                supersonic.ui.dialog.alert(
-                  'Error: ' + error.code + ' ' + error.message);
-              });
+    $scope.taskEnter = function(event, pair, index) {
+      if (event.which === 13) {
+        event.preventDefault();
+        var taskElement = document.getElementById(
+            'task-' + pair.geoList.data.id + '-' + index.toString());
+        var taskContent = taskElement.innerText;
+        saveTask(pair, index, taskContent);
+        taskElement.innerText = taskContent;
+        taskElement.blur();
+      }
+    };
+
+    $scope.deleteTask = function(pair, index) {
+      if (index == pair.tasks.length - 1 && $scope.disableAdd) {
+        pair.tasks.splice(index, 1);
+        $scope.disableAdd = false;
+      } else {
+        pair.tasks[index].delete().then(function(result) {
+          pair.tasks.splice(index, 1);
+          if (pair.tasks.length === 0) {
+            congratsAlert();
           }
-        });
+        }, alertParseError);
+      }
     };
 
-    $scope.editTask = function(task) {
-      task.editing = true;
-    };
-
-    $scope.discardEdits = function(task) {
-      var options = {
-        message: 'Do you wish to discard changes?',
-        buttonLabels: ['Yes', 'No']
-      };
-
-      supersonic.ui.dialog.confirm('Confim', options)
-        .then(function(index) {
-          if (index === 0) {
-            task.fetch()
-              .then(function() {
-                task.editing = false;
-              }, function(error) {
-                supersonic.ui.dialog.alert(
-                  'Error: ' + error.code + ' ' + error.message);
-              });
-          }
-        });
-    };
-
-    $scope.saveTask = function(task) {
-      task.done = false;
-
-      task.save()
-        .then(function(results) {
-          task.editing = false;
-        }, function(error) {
-          supersonic.ui.dialog.alert(
-              'Error: ' + error.code + ' ' + error.message);
-        });
-    };
-
-    $scope.congratsAlert = function(task) {
+    $scope.toggleTask = function(pair, task) {
       task.done = !task.done;
       task.save()
         .then(function(results) {
-          if (task.done) {
-            var options = {
-              message: 'You finished a task!',
-              buttonLabel: 'Close'
-            };
-            supersonic.ui.dialog.alert('Congratulations!', options);
+          if (allTasksDone(pair)) {
+            congratsAlert();
           }
-          getTasks();
-        }, function(error) {
-          supersonic.ui.dialog.alert(
-              'Error: ' + error.code + ' ' + error.message);
-        });
+        }, alertParseError);
     };
 
-    supersonic.ui.views.current.whenVisible(getTasks);
+    var congratsAlert = function() {
+      var options = {
+        message: 'You\'ve finished all your tasks!',
+        buttonLabel: 'Hooray!'
+      };
+      supersonic.ui.dialog.alert('Congratulations!', options);
+    };
+
+    var allTasksDone = function(pair) {
+      return _.every(pair.tasks, function(task) {
+        return task.done;
+      });
+    };
+
+    supersonic.ui.views.current.whenVisible(initialize);
   }]);

@@ -26,3 +26,12 @@ html, body {
 .card {
   margin: 0px;
 }
+
+.task-list p {
+  white-space: normal;
+}
+
+.task-list textarea {
+  line-height: 20px;
+}
+
