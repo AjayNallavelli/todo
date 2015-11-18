@@ -71,8 +71,8 @@ angular
           return !task.done;
         }).length;
         if (incomplete) {
-          var message = 'Pick up ' + incomplete + ' items at ' +
-              pair.geoList.name + '.';
+          var message = 'Pick up ' + incomplete + ' item' +
+              (incomplete > 1 ? 's' : '') + ' at ' + pair.geoList.name + '.';
           push.send({
             title: 'ToDo',
             message: message
