@@ -6,6 +6,8 @@
   <div class="card" ng-repeat="pair in pairs">
     <div class="item item-divider">
       {{ pair.geoList.name }}
+      <p>{{ pair.geoList.storeName }}</p>
+      <p>{{ pair.geoList.address }}</p>
     </div>
     <div ng-repeat="task in pair.tasks">
       <div class="item item-input">

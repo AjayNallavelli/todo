@@ -17,10 +17,11 @@ angular
 
     var geoList = null;
 
-    var setLocation = function(coords) {
+    var setLocation = function(coords, locationDetails) {
       $scope.markers = [{
         id: 'id',
-        coords: coords
+        coords: coords,
+        locationDetails: locationDetails
       }];
       $scope.$apply(function($scope) {
         $scope.map.center.latitude = coords.latitude;
@@ -30,9 +31,20 @@ angular
 
     var placesChanged = function(searchBox) {
       var place = searchBox.getPlaces()[0];
+
+      // get address minus country
+      // jscs:disable requireCamelCaseOrUpperCaseIdentifiers
+      var address = place.formatted_address;
+      // jscs:enable requireCamelCaseOrUpperCaseIdentifiers
+
+      address = address.substring(0, address.lastIndexOf(','));
+
       setLocation({
         latitude: place.geometry.location.lat(),
         longitude: place.geometry.location.lng()
+      }, {
+        address: address,
+        storeName: place.name
       });
     };
     $scope.searchbox = {
@@ -46,8 +58,12 @@ angular
 
     var back = function() {
       if (geoList && $scope.markers.length) {
+        console.log($scope.markers[0]);
+
         geoList.save({
-          location: new Parse.GeoPoint($scope.markers[0].coords)
+          location: new Parse.GeoPoint($scope.markers[0].coords),
+          address: $scope.markers[0].locationDetails.address,
+          storeName: $scope.markers[0].locationDetails.storeName
         }).then(function() {
           supersonic.ui.layers.pop();
         });
