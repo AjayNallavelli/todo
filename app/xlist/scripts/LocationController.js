@@ -47,10 +47,6 @@ angular
 
     $scope.searchbox = {
       template: 'searchbox.tpl.html',
-      options: {
-        autocomplete: true,
-        // bounds: {}
-      },
       events: {
         // jscs:disable requireCamelCaseOrUpperCaseIdentifiers
         places_changed: placesChanged
