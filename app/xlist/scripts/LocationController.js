@@ -29,12 +29,13 @@ angular
     var placesChanged = function(searchBox) {
       var place = searchBox.getPlaces()[0];
 
-      // get address minus country
+      // retrieve address from Google Maps API and remove country from string
+      // input:  2145 Sheridan Rd., Evanston, IL 60201, United States
+      // output: 2145 Sheridan Rd., Evanston, IL 60201
       // jscs:disable requireCamelCaseOrUpperCaseIdentifiers
       var address = place.formatted_address;
-      // jscs:enable requireCamelCaseOrUpperCaseIdentifiers
-
       address = address.substring(0, address.lastIndexOf(','));
+      // jscs:enable requireCamelCaseOrUpperCaseIdentifiers
 
       setLocation({
         latitude: place.geometry.location.lat(),
