@@ -57,7 +57,7 @@ angular
     };
 
     var backButton = new supersonic.ui.NavigationBarButton({
-      title: 'Back',
+      title: 'Save',
       onTap: back
     });
 
