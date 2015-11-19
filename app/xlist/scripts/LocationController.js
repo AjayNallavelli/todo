@@ -104,6 +104,8 @@ angular
       });
     };
 
+    // Exact distance depends where on globe you are, since latlng aren't linear
+    // Around Chicago, this is ~8 miles N/S and ~7 miles E/W
     supersonic.data.channel('location').subscribe(function(location) {
       uiGmapGoogleMapApi.then(function(maps) {
         var lat = parseFloat(location.latitude);
