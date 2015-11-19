@@ -45,12 +45,11 @@ angular
       });
     };
 
-
     $scope.searchbox = {
       template: 'searchbox.tpl.html',
       options: {
         autocomplete: true,
-        bounds: {}
+        // bounds: {}
       },
       events: {
         // jscs:disable requireCamelCaseOrUpperCaseIdentifiers
@@ -96,9 +95,14 @@ angular
         queryGeoLists.get(params.id).then(function(result) {
           geoList = result;
           var location = geoList.get('location');
+          var address = geoList.get('address');
+          var storeName = geoList.get('storeName');
           setLocation({
             latitude: location.latitude,
             longitude: location.longitude
+          }, {
+            address: address,
+            storeName: storeName
           });
         });
       });
