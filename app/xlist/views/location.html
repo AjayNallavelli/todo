@@ -2,8 +2,8 @@
   <script type="text/ng-template" id="searchbox.tpl.html">
     <input id="map-search-box" type="text" placeholder="Search" style="width: 100%; padding: 5px;">
   </script>
-  <ui-gmap-google-map center="map.center" zoom="map.zoom" draggable="true" options="options">
-    <ui-gmap-search-box template="searchbox.template" events="searchbox.events"></ui-gmap-search-box>
+  <ui-gmap-google-map center="map.center" zoom="map.zoom" draggable="true">
+    <ui-gmap-search-box template="searchbox.template" events="searchbox.events" options="searchbox.options"></ui-gmap-search-box>
     <ui-gmap-markers models="markers" coords="'coords'"></ui-gmap-markers>
   </ui-gmap-google-map>
 </div>
