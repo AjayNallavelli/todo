@@ -11,9 +11,6 @@ angular
       zoom: 16
     };
     $scope.markers = [];
-    $scope.options = {
-      autocomplete: true
-    };
 
     var geoList = null;
 
@@ -35,8 +32,14 @@ angular
         longitude: place.geometry.location.lng()
       });
     };
+
+
     $scope.searchbox = {
       template: 'searchbox.tpl.html',
+      options: {
+        autocomplete: true,
+        bounds: {}
+      },
       events: {
         // jscs:disable requireCamelCaseOrUpperCaseIdentifiers
         places_changed: placesChanged
@@ -84,6 +87,17 @@ angular
         });
       });
     };
+
+    supersonic.data.channel('location').subscribe(function(location) {
+      uiGmapGoogleMapApi.then(function(maps) {
+        var lat = parseFloat(location.latitude);
+        var lng = parseFloat(location.longitude);
+        $scope.searchbox.options.bounds = new maps.LatLngBounds(
+          new maps.LatLng(lat - 0.1, lng - 0.1),
+          new maps.LatLng(lat + 0.1, lng + 0.1)
+        );
+      });
+    });
 
     supersonic.ui.views.current.whenVisible(getGeoList);
   }]);
