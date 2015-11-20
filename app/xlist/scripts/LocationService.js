@@ -11,7 +11,7 @@ angular
         longitude: position.coords.longitude,
         timestamp: position.timestamp
       };
-    }
+    };
     location.override = function(location) {
       overrideLocation = location ? {
         latitude: location.latitude,
