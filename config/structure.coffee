@@ -3,7 +3,7 @@
 module.exports =
 
   rootView:
-    location: "xlist#home"
+    location: "xlist#geolist"
 
   preloads: []
 
