@@ -1,8 +1,10 @@
 angular
   .module('xlist')
   .controller('LocationController',
-      ['$scope', 'supersonic', 'deviceReady', 'GeoList', 'uiGmapGoogleMapApi',
-  function($scope, supersonic, deviceReady, GeoList, uiGmapGoogleMapApi) {
+      ['$scope', 'supersonic', 'deviceReady', 'locationService', 'GeoList',
+       'uiGmapGoogleMapApi',
+  function($scope, supersonic, deviceReady, locationService, GeoList,
+           uiGmapGoogleMapApi) {
     $scope.map = {
       center: {
         latitude: 0,
@@ -52,7 +54,8 @@ angular
         // jscs:disable requireCamelCaseOrUpperCaseIdentifiers
         places_changed: placesChanged
         // jscs:enable requireCamelCaseOrUpperCaseIdentifiers
-      }
+      },
+      options: {}
     };
 
     var back = function() {
@@ -101,22 +104,25 @@ angular
             address: address,
             storeName: storeName
           });
+        }).then(function() {
+          locationService.get().then(setBounds).then(function() {
+            locationService.watch(setBounds);
+          });
         });
       });
     };
 
     // Exact distance depends where on globe you are, since latlng aren't linear
     // Around Chicago, this is ~8 miles N/S and ~7 miles E/W
-    supersonic.data.channel('location').subscribe(function(location) {
+    var setBounds = function(location) {
+      console.log(JSON.stringify(location));
       uiGmapGoogleMapApi.then(function(maps) {
-        var lat = parseFloat(location.latitude);
-        var lng = parseFloat(location.longitude);
         $scope.searchbox.options.bounds = new maps.LatLngBounds(
-          new maps.LatLng(lat - 0.1, lng - 0.1),
-          new maps.LatLng(lat + 0.1, lng + 0.1)
+          new maps.LatLng(location.latitude - 0.1, location.longitude - 0.1),
+          new maps.LatLng(location.latitude + 0.1, location.longitude + 0.1)
         );
       });
-    });
+    };
 
     supersonic.ui.views.current.whenVisible(getGeoList);
   }]);
