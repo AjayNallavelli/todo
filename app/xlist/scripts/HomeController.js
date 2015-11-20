@@ -2,13 +2,12 @@ angular
   .module('xlist')
   .controller('HomeController',
       ['$scope', '$q', 'supersonic', 'GeoList', 'Task', 'deviceReady',
-       'slackbot', 'push', 'ParseObject',
+       'slackbot', 'push', 'locationService', 'ParseObject',
   function($scope, $q, supersonic, GeoList, Task, deviceReady, slackbot, push,
-           ParseObject) {
+           locationService, ParseObject) {
     $scope.pairs = [];
     $scope.disableAdd = false;
-    var fields = ['name', 'done', 'category', 'deadline'];
-    var overrideLocation = null;
+    $scope.os = '';
 
     // Haversine formula for getting distance in miles.
     var getDistance = function(p1, p2) {
@@ -34,7 +33,7 @@ angular
                 result.input.toLowerCase();
           });
           if (pair) {
-            overrideLocation = pair.geoList.location;
+            locationService.override(pair.geoList.location);
             supersonic.ui.dialog.alert('Set Location', {
               message: 'Location set to location of ' + pair.geoList.name + '.'
             });
@@ -45,22 +44,6 @@ angular
           }
         }
       });
-    };
-
-    var getLocation = function() {
-      var deferred = $q.defer();
-      if (overrideLocation) {
-        deferred.resolve(overrideLocation);
-      }
-      supersonic.device.geolocation.getPosition().then(function(position) {
-        var hardwareLocation = {
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
-          timestamp: position.timestamp
-        };
-        deferred.resolve(hardwareLocation);
-      }, deferred.reject);
-      return deferred.promise;
     };
 
     var pushNear = function(pair) {
@@ -93,8 +76,6 @@ angular
           pushNear(pair);
         }
       });
-      // used to pass location to location controller
-      supersonic.data.channel('location').publish(location);
     };
 
     deviceReady().then(function() {
@@ -106,7 +87,7 @@ angular
         supersonic.ui.dialog.alert('Failed to enable background mode.');
       }
       window.setInterval(function() {
-        getLocation().then(findNearAndPassLocation);
+        locationService.get().then(findNearAndPassLocation);
       }, 10 * 1000);
     });
 
@@ -144,6 +125,8 @@ angular
           return pair.geoList.name;
         });
       });
+
+      $scope.os = getMobileOperatingSystem();
     };
 
     $scope.addTask = function(pair) {
@@ -159,6 +142,7 @@ angular
     var saveTask = function(pair, index, taskContent) {
       var task = pair.tasks[index];
       task.name = (taskContent || task.name).trim();
+
       if (task.name.length) {
         task.done = false;
         task.save().catch(alertParseError);
@@ -173,6 +157,7 @@ angular
         event.preventDefault();
         var taskElement = document.getElementById(
             'task-' + pair.geoList.data.id + '-' + index.toString());
+
         var taskContent = taskElement.innerText;
         saveTask(pair, index, taskContent);
         taskElement.innerText = taskContent;
@@ -216,6 +201,25 @@ angular
       return _.every(pair.tasks, function(task) {
         return task.done;
       });
+    };
+
+    /**
+     * Determine the mobile operating system.
+     * This function either returns 'iOS', 'Android' or 'unknown'
+     *
+     * @returns {String}
+     */
+    var getMobileOperatingSystem = function() {
+      var userAgent = navigator.userAgent || navigator.vendor || window.opera;
+
+      if (userAgent.match(/iPad/i) || userAgent.match(/iPhone/i) ||
+        userAgent.match(/iPod/i)) {
+        return 'iOS';
+      } else if (userAgent.match(/Android/i)) {
+        return 'Android';
+      } else {
+        return 'unknown';
+      }
     };
 
     supersonic.ui.views.current.whenVisible(initialize);
