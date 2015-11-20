@@ -2,14 +2,12 @@ angular
   .module('xlist')
   .controller('HomeController',
       ['$scope', '$q', 'supersonic', 'GeoList', 'Task', 'deviceReady',
-       'slackbot', 'push', 'ParseObject',
+       'slackbot', 'push', 'locationService', 'ParseObject',
   function($scope, $q, supersonic, GeoList, Task, deviceReady, slackbot, push,
-           ParseObject) {
+           locationService, ParseObject) {
     $scope.pairs = [];
     $scope.disableAdd = false;
     $scope.os = '';
-    var fields = ['name', 'done', 'category', 'deadline'];
-    var overrideLocation = null;
 
     // Haversine formula for getting distance in miles.
     var getDistance = function(p1, p2) {
@@ -35,7 +33,7 @@ angular
                 result.input.toLowerCase();
           });
           if (pair) {
-            overrideLocation = pair.geoList.location;
+            locationService.override(pair.geoList.location);
             supersonic.ui.dialog.alert('Set Location', {
               message: 'Location set to location of ' + pair.geoList.name + '.'
             });
@@ -46,22 +44,6 @@ angular
           }
         }
       });
-    };
-
-    var getLocation = function() {
-      var deferred = $q.defer();
-      if (overrideLocation) {
-        deferred.resolve(overrideLocation);
-      }
-      supersonic.device.geolocation.getPosition().then(function(position) {
-        var hardwareLocation = {
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
-          timestamp: position.timestamp
-        };
-        deferred.resolve(hardwareLocation);
-      }, deferred.reject);
-      return deferred.promise;
     };
 
     var pushNear = function(pair) {
@@ -94,8 +76,6 @@ angular
           pushNear(pair);
         }
       });
-      // used to pass location to location controller
-      supersonic.data.channel('location').publish(location);
     };
 
     deviceReady().then(function() {
@@ -107,7 +87,7 @@ angular
         supersonic.ui.dialog.alert('Failed to enable background mode.');
       }
       window.setInterval(function() {
-        getLocation().then(findNearAndPassLocation);
+        locationService.get().then(findNearAndPassLocation);
       }, 10 * 1000);
     });
 
