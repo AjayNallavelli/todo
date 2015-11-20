@@ -113,19 +113,20 @@ angular
     var initialize = function() {
       var newPairs = [];
       var queryGeoLists = new Parse.Query(GeoList);
-      queryGeoLists.each(function(geoList) {
-        return getTasks(geoList).then(function(tasks) {
-          newPairs.push({
-            geoList: new ParseObject(geoList, GeoList.fields),
-            tasks: tasks
+      supersonic.ui.views.current.params.onValue(function(params) {
+        queryGeoLists.get(params.id).then(function(geoList) {
+          getTasks(geoList).then(function(tasks) {
+            newPairs.push({
+              geoList: new ParseObject(geoList, GeoList.fields),
+              tasks: tasks
+            });
+          });
+        }).then(function() {
+          $scope.$apply(function($scope) {
+            $scope.pairs = newPairs;
           });
         });
-      }).then(function() {
-        $scope.pairs = _.sortBy(newPairs, function(pair) {
-          return pair.geoList.name;
-        });
       });
-
       $scope.os = getMobileOperatingSystem();
     };
 

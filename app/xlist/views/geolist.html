@@ -2,11 +2,14 @@
   <super-navbar>
     <super-navbar-title>ToDo</super-navbar-title>
   </super-navbar>
-  <div class="card" ng-repeat="geolist in geolists">
-    <div class="item item-divider">
-      {{ geolist.name }}
-      <p>{{ geolist.storeName }}</p>
-      <p>{{ geolist.address }}</p>
-    </div>
-  </div>
+
+  <ul class="list">
+    <super-navigate location="xlist#home" ng-repeat="geolist in geolists" data-params-id="{{ geolist.data.id }}">
+      <li class="item">
+        <h2>{{ geolist.name }}</h2>
+        <p>{{ geolist.storeName }}</p>
+        <p>{{ geolist.address }}</p>
+      </li>
+    </super-navigate>
+  </ul>
 </div>
