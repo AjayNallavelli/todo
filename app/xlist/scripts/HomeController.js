@@ -7,6 +7,7 @@ angular
            locationService, ParseObject) {
     $scope.pairs = [];
     $scope.disableAdd = false;
+    $scope.os = '';
 
     // Haversine formula for getting distance in miles.
     var getDistance = function(p1, p2) {
@@ -124,6 +125,8 @@ angular
           return pair.geoList.name;
         });
       });
+
+      $scope.os = getMobileOperatingSystem();
     };
 
     $scope.addTask = function(pair) {
@@ -139,6 +142,7 @@ angular
     var saveTask = function(pair, index, taskContent) {
       var task = pair.tasks[index];
       task.name = (taskContent || task.name).trim();
+
       if (task.name.length) {
         task.done = false;
         task.save().catch(alertParseError);
@@ -153,6 +157,7 @@ angular
         event.preventDefault();
         var taskElement = document.getElementById(
             'task-' + pair.geoList.data.id + '-' + index.toString());
+
         var taskContent = taskElement.innerText;
         saveTask(pair, index, taskContent);
         taskElement.innerText = taskContent;
@@ -196,6 +201,25 @@ angular
       return _.every(pair.tasks, function(task) {
         return task.done;
       });
+    };
+
+    /**
+     * Determine the mobile operating system.
+     * This function either returns 'iOS', 'Android' or 'unknown'
+     *
+     * @returns {String}
+     */
+    var getMobileOperatingSystem = function() {
+      var userAgent = navigator.userAgent || navigator.vendor || window.opera;
+
+      if (userAgent.match(/iPad/i) || userAgent.match(/iPhone/i) ||
+        userAgent.match(/iPod/i)) {
+        return 'iOS';
+      } else if (userAgent.match(/Android/i)) {
+        return 'Android';
+      } else {
+        return 'unknown';
+      }
     };
 
     supersonic.ui.views.current.whenVisible(initialize);
