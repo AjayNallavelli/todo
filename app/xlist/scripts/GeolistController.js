@@ -4,14 +4,15 @@ angular
       ['$scope', '$q', 'supersonic', 'GeoList', 'Task', 'deviceReady',
        'slackbot', 'push', 'ParseObject',
   function($scope, $q, supersonic, GeoList, Task, deviceReady, slackbot, push,
-           ParseObject) { 
+           ParseObject) {
 
     $scope.geolists = [];
 
     var getGeolists = function() {
       new Parse.Query(GeoList).find().then(function(results) {
-        // iterate through all results
-        // $scope.geolists.push(new ParseObject(results[i], Geolist.fields));
+        _.each(results, function(result)){
+          $scope.geolists.push(new ParseObject(result, Geolist.fields))
+        }
       });
     };
 
