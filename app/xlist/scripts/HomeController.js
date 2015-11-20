@@ -86,13 +86,15 @@ angular
 
     var THRESHOLD = 0.25;
 
-    var findNear = function(location) {
+    var findNearAndPassLocation = function(location) {
       _.each($scope.pairs, function(pair) {
         var distance = getDistance(location, pair.geoList.location);
         if (distance < THRESHOLD) {
           pushNear(pair);
         }
       });
+      // used to pass location to location controller
+      supersonic.data.channel('location').publish(location);
     };
 
     deviceReady().then(function() {
@@ -104,7 +106,7 @@ angular
         supersonic.ui.dialog.alert('Failed to enable background mode.');
       }
       window.setInterval(function() {
-        getLocation().then(findNear);
+        getLocation().then(findNearAndPassLocation);
       }, 10 * 1000);
     });
 

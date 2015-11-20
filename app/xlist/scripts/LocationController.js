@@ -11,16 +11,14 @@ angular
       zoom: 16
     };
     $scope.markers = [];
-    $scope.options = {
-      autocomplete: true
-    };
 
     var geoList = null;
 
-    var setLocation = function(coords) {
+    var setLocation = function(coords, locationDetails) {
       $scope.markers = [{
         id: 'id',
-        coords: coords
+        coords: coords,
+        locationDetails: locationDetails
       }];
       $scope.$apply(function($scope) {
         $scope.map.center.latitude = coords.latitude;
@@ -30,11 +28,24 @@ angular
 
     var placesChanged = function(searchBox) {
       var place = searchBox.getPlaces()[0];
+
+      // retrieve address from Google Maps API and remove country from string
+      // input:  2145 Sheridan Rd., Evanston, IL 60201, United States
+      // output: 2145 Sheridan Rd., Evanston, IL 60201
+      // jscs:disable requireCamelCaseOrUpperCaseIdentifiers
+      var address = place.formatted_address;
+      address = address.substring(0, address.lastIndexOf(','));
+      // jscs:enable requireCamelCaseOrUpperCaseIdentifiers
+
       setLocation({
         latitude: place.geometry.location.lat(),
         longitude: place.geometry.location.lng()
+      }, {
+        address: address,
+        storeName: place.name
       });
     };
+
     $scope.searchbox = {
       template: 'searchbox.tpl.html',
       events: {
@@ -46,8 +57,12 @@ angular
 
     var back = function() {
       if (geoList && $scope.markers.length) {
+        console.log($scope.markers[0]);
+
         geoList.save({
-          location: new Parse.GeoPoint($scope.markers[0].coords)
+          location: new Parse.GeoPoint($scope.markers[0].coords),
+          address: $scope.markers[0].locationDetails.address,
+          storeName: $scope.markers[0].locationDetails.storeName
         }).then(function() {
           supersonic.ui.layers.pop();
         });
@@ -57,7 +72,7 @@ angular
     };
 
     var backButton = new supersonic.ui.NavigationBarButton({
-      title: 'Back',
+      title: 'Save',
       onTap: back
     });
 
@@ -77,13 +92,31 @@ angular
         queryGeoLists.get(params.id).then(function(result) {
           geoList = result;
           var location = geoList.get('location');
+          var address = geoList.get('address');
+          var storeName = geoList.get('storeName');
           setLocation({
             latitude: location.latitude,
             longitude: location.longitude
+          }, {
+            address: address,
+            storeName: storeName
           });
         });
       });
     };
+
+    // Exact distance depends where on globe you are, since latlng aren't linear
+    // Around Chicago, this is ~8 miles N/S and ~7 miles E/W
+    supersonic.data.channel('location').subscribe(function(location) {
+      uiGmapGoogleMapApi.then(function(maps) {
+        var lat = parseFloat(location.latitude);
+        var lng = parseFloat(location.longitude);
+        $scope.searchbox.options.bounds = new maps.LatLngBounds(
+          new maps.LatLng(lat - 0.1, lng - 0.1),
+          new maps.LatLng(lat + 0.1, lng + 0.1)
+        );
+      });
+    });
 
     supersonic.ui.views.current.whenVisible(getGeoList);
   }]);

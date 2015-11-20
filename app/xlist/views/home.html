@@ -6,6 +6,8 @@
   <div class="card" ng-repeat="pair in pairs">
     <div class="item item-divider">
       {{ pair.geoList.name }}
+      <p>{{ pair.geoList.storeName }}</p>
+      <p>{{ pair.geoList.address }}</p>
     </div>
     <div ng-repeat="task in pair.tasks">
       <div class="item item-input">
@@ -15,7 +17,8 @@
         </div>
 
         <div class="task-list col col-75">
-          <p contenteditable="true" placeholder="Enter task" ng-attr-id="task-{{pair.geoList.data.id}}-{{$index}}" ng-keypress="taskEnter($event, pair, $index)">{{ task.name }}</p>
+          <p contenteditable="true" placeholder="Enter task" ng-if="!task.done" ng-attr-id="task-{{pair.geoList.data.id}}-{{$index}}" ng-keypress="taskEnter($event, pair, $index)">{{ task.name }}</p>
+          <p contenteditable="true" placeholder="Enter task" ng-if="task.done" ng-attr-id="task-{{pair.geoList.data.id}}-{{$index}}" ng-keypress="taskEnter($event, pair, $index)"><s>{{ task.name }}</s></p>
         </div>
 
         <div class="col col-10">
@@ -25,12 +28,12 @@
     </div>
     <button class="button button-block button-positive" ng-if="!disableAdd" ng-click="addTask(pair)">Add Item</button>
     <button class="button button-block button-light" ng-if="disableAdd">Add Item</button>
-    <super-navigate location="xlist#location" data-params-id="{{ pair.geoList.data.id }}" >
+    <super-navigate location="xlist#location" data-params-id="{{ pair.geoList.data.id }}">
       <button class="button button-block button-positive">
-        Set Location
+        Edit Location
       </button>
     </super-navigate>
   </div>
-  <button class="button button-block button-positive" ng-click="setLocation()">Simulate Location</button>
+  <!-- <button class="button button-block button-positive" ng-click="setLocation()">Simulate Location</button> -->
 
 </div>
