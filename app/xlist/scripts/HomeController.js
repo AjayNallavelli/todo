@@ -78,19 +78,6 @@ angular
       });
     };
 
-    deviceReady().then(function() {
-      cordova.plugins.backgroundMode.configure({
-        silent: true
-      });
-      cordova.plugins.backgroundMode.enable();
-      if (!cordova.plugins.backgroundMode.isEnabled()) {
-        supersonic.ui.dialog.alert('Failed to enable background mode.');
-      }
-      window.setInterval(function() {
-        locationService.get().then(findNearAndPassLocation);
-      }, 10 * 1000);
-    });
-
     var alertParseError = function(error) {
       supersonic.ui.dialog.alert('Error: ' + error.code + ' ' + error.message);
     };
@@ -111,22 +98,37 @@ angular
     };
 
     var initialize = function() {
-      var newPairs = [];
-      var queryGeoLists = new Parse.Query(GeoList);
-      queryGeoLists.each(function(geoList) {
-        return getTasks(geoList).then(function(tasks) {
-          newPairs.push({
-            geoList: new ParseObject(geoList, GeoList.fields),
-            tasks: tasks
+      deviceReady().then(function() {
+        cordova.plugins.backgroundMode.configure({
+          silent: true
+        });
+        cordova.plugins.backgroundMode.enable();
+        if (!cordova.plugins.backgroundMode.isEnabled()) {
+          supersonic.ui.dialog.alert('Failed to enable background mode.');
+        }
+        window.setInterval(function() {
+          locationService.get().then(findNearAndPassLocation);
+        }, 10 * 1000);
+
+        var newPairs = [];
+        var queryGeoLists = new Parse.Query(GeoList)
+          .equalTo('uuid', device.uuid);
+
+        queryGeoLists.each(function(geoList) {
+          return getTasks(geoList).then(function(tasks) {
+            newPairs.push({
+              geoList: new ParseObject(geoList, GeoList.fields),
+              tasks: tasks
+            });
+          });
+        }).then(function() {
+          $scope.pairs = _.sortBy(newPairs, function(pair) {
+            return pair.geoList.name;
           });
         });
-      }).then(function() {
-        $scope.pairs = _.sortBy(newPairs, function(pair) {
-          return pair.geoList.name;
-        });
-      });
 
-      $scope.os = getMobileOperatingSystem();
+        $scope.os = getMobileOperatingSystem();
+      });
     };
 
     $scope.addTask = function(pair) {
