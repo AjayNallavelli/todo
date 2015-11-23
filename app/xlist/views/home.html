@@ -3,7 +3,7 @@
     <super-navbar-title>ToDo</super-navbar-title>
   </super-navbar>
 
-  <div class="card" ng-repeat="pair in pairs">
+  <div class="card" ng-if="pairs.length != 0" ng-repeat="pair in pairs">
     <div class="item item-divider">
       {{ pair.geoList.name }}
       <p>{{ pair.geoList.storeName }}</p>
@@ -37,6 +37,10 @@
       </button>
     </super-navigate>
   </div>
+  <div ng-if="pairs.length == 0">
+    <h2>No lists found. Create one?</h2>
+  </div>
+
   <!-- <button class="button button-block button-positive" ng-click="setLocation()">Simulate Location</button> -->
 
 </div>
