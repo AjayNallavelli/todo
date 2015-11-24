@@ -4,11 +4,13 @@
   </super-navbar>
 
   <div class="card" ng-repeat="pair in pairs">
-    <div class="item item-divider">
-      {{ pair.geoList.name }}
-      <p>{{ pair.geoList.storeName }}</p>
-      <p>{{ pair.geoList.address }}</p>
-    </div>
+    <super-navigate location="xlist#location" data-params-id="{{ pair.geoList.data.id }}">
+      <div class="item item-divider">
+        {{ pair.geoList.name }}
+        <p>{{ pair.geoList.storeName }}</p>
+        <p>{{ pair.geoList.address }}</p>
+      </div>
+    </super-navigate>
     <div ng-repeat="task in pair.tasks">
       <div class="item item-input">
         <div>
@@ -31,11 +33,6 @@
     </div>
     <button class="button button-block button-positive" ng-if="!disableAdd" ng-click="addTask(pair)">Add Item</button>
     <button class="button button-block button-light" ng-if="disableAdd">Add Item</button>
-    <super-navigate location="xlist#location" data-params-id="{{ pair.geoList.data.id }}">
-      <button class="button button-block button-positive">
-        Edit Location
-      </button>
-    </super-navigate>
   </div>
   <!-- <button class="button button-block button-positive" ng-click="setLocation()">Simulate Location</button> -->
 
