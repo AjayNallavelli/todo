@@ -10,7 +10,10 @@ angular
         latitude: 0,
         longitude: 0
       },
-      zoom: 16
+      zoom: 16,
+      options: {
+        streetViewControl: false
+      }
     };
     $scope.markers = [];
 
