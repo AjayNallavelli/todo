@@ -99,12 +99,14 @@ angular
 
     var initialize = function() {
       deviceReady().then(function() {
-        cordova.plugins.backgroundMode.configure({
-          silent: true
-        });
-        cordova.plugins.backgroundMode.enable();
-        if (!cordova.plugins.backgroundMode.isEnabled()) {
-          supersonic.ui.dialog.alert('Failed to enable background mode.');
+        if (cordova.plugins.backgroundMode) {
+          cordova.plugins.backgroundMode.configure({
+            silent: true
+          });
+          cordova.plugins.backgroundMode.enable();
+          if (!cordova.plugins.backgroundMode.isEnabled()) {
+            supersonic.ui.dialog.alert('Failed to enable background mode.');
+          }
         }
         window.setInterval(function() {
           locationService.get().then(findNearAndPassLocation);
