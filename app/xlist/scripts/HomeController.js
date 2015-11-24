@@ -124,9 +124,28 @@ angular
             });
           });
         }).then(function() {
-          $scope.pairs = _.sortBy(newPairs, function(pair) {
-            return pair.geoList.name;
-          });
+          if (newPairs.length === 0) {
+            var newGeoPoint = new ParseObject(new GeoList(), GeoList.fields);
+            newGeoPoint.name = 'To-Do List';
+            newGeoPoint.location = new Parse.GeoPoint({
+              latitude: 0.0,
+              longitude: 0.0
+            });
+            newGeoPoint.uuid = device.uuid;
+            newGeoPoint.address = '';
+            newGeoPoint.storeName = '';
+
+            newGeoPoint.save().then(function() {
+              $scope.pairs.push({
+                geoList: newGeoPoint,
+                tasks: []
+              });
+            }).catch(alertParseError);
+          } else {
+            $scope.pairs = _.sortBy(newPairs, function(pair) {
+              return pair.geoList.name;
+            });
+          }
         });
 
         $scope.os = getMobileOperatingSystem();
