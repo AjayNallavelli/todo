@@ -115,6 +115,7 @@ angular
         var newPairs = [];
         var queryGeoLists = new Parse.Query(GeoList)
           .equalTo('uuid', device.uuid);
+          $scope.id = device.uuid
 
         queryGeoLists.each(function(geoList) {
           return getTasks(geoList).then(function(tasks) {
