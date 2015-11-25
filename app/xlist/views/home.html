@@ -9,8 +9,8 @@
         <div class="row">
           <div class="col col-90">
             {{ pair.geoList.name }}
-            <p>{{ pair.geoList.storeName }}</p>
-            <p>{{ pair.geoList.address }}</p>
+            <p>{{ pair.geoList.storeName || '' }}</p>
+            <p>{{ pair.geoList.address || 'Tap to add store location' }}</p>
           </div>
           <div class="col col-center">
             <button class="button button-small button-icon icon super-edit" style="line-height: 0px;"></button>

@@ -5,5 +5,5 @@ angular
       {fields: ['name', 'done', 'geoList']}))
   .constant('GeoList', _.extend(
       Parse.Object.extend('GeoList'),
-      {fields: ['location', 'name', 'nextNotification', 'storeName',
+      {fields: ['uuid', 'location', 'name', 'nextNotification', 'storeName',
                 'address']}));
