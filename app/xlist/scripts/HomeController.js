@@ -6,7 +6,7 @@ angular
   function($scope, $q, supersonic, GeoList, Task, deviceReady, slackbot, push,
            locationService, ParseObject) {
     $scope.pairs = [];
-    $scope.activePairIndices = [];
+    $scope.activePairTasks = [];
     $scope.os = '';
 
     // Haversine formula for getting distance in miles.
@@ -133,13 +133,8 @@ angular
       });
     };
 
-    var taskId = function(pair, index) {
-      return 'task-' + pair.geoList.data.id + '-' + index.toString();
-    };
-
-    var getNewTaskId = function() {
-      return $scope.newPairIndex && taskId(
-          $scope.newPairIndex.pair, $scope.newPairIndex.index);
+    var taskId = function(pair, task) {
+      return 'task-' + pair.geoList.data.id + '-' + task.data.uiid;
     };
 
     var makeDebounceQueue = function(enqueue, dequeue, state, terminate) {
@@ -198,10 +193,11 @@ angular
           if (state.indexOf(task.data.id) < 0) {
             state.push(task.data.id);
           } else {
+            console.log('already saved in this flush');
             return;
           }
-          var index = pair.tasks.indexOf(task);
-          var element = document.getElementById(taskId(pair, index));
+          console.log(taskId(pair, task));
+          var element = document.getElementById(taskId(pair, task));
           var newName = hybridFieldValue(element);
           if (newName.length) {
             $scope.$apply(function($scope) {
@@ -224,6 +220,28 @@ angular
           state.splice(0, state.length);
         });
 
+    var findActivePairTask = function(pair, task) {
+      return _.findIndex($scope.activePairTasks, function(pairTask) {
+        return pairTask.pair === pair && pairTask.task === task;
+      });
+    };
+
+    var pushActivePairTask = function(pair, task) {
+      if (findActivePairTask(pair, task) < 0) {
+        $scope.activePairTasks.push({pair: pair, task: task});
+      }
+    };
+
+    var removeActivePairTask = function(pair, task) {
+      var index = findActivePairTask(pair, task);
+      if (index >= 0) {
+        $scope.activePairTasks.splice(index, 1);
+        return true;
+      } else {
+        return false;
+      }
+    };
+
     $scope.addTask = function(pair) {
       console.log('addTask');
       var task = new ParseObject(new Task(), Task.fields);
@@ -231,47 +249,40 @@ angular
       task.category = '';
       task.done = false;
       task.geoList = pair.geoList.data.toPointer();
+      task.data.uiid = Date.now();
       pair.tasks.push(task);
-      $scope.activePairIndices.push({pair: pair, index: pair.tasks.length - 1});
+      pushActivePairTask(pair, task);
     };
 
-    $scope.taskKey = function(event, pair, index) {
+    $scope.taskKey = function(event, pair, task) {
       console.log('taskKey');
       if ((event.keyCode || event.which) === 13) {
         event.preventDefault();
-        queueSaveTask(pair, pair.tasks[index]);
+        queueSaveTask(pair, task);
       }
     };
 
-    var saveNewTask = function() {
-      queueSaveTask($scope.newPairIndex.pair,
-                    $scope.newPairIndex.pair.tasks[$scope.newPairIndex.index]);
-    };
-
-    $scope.taskFocus = function(pair, index) {
+    $scope.taskFocus = function(pair, task) {
       console.log('taskFocus');
-      var newTaskId = getNewTaskId();
-      $scope.activePairIndices.each(function(pairIndex) {
-        queueSaveTask(pairIndex.pair, pairIndex.pair[pairIndex.index]);
-      });
-      $scope.activePairIndices.push({pair: pair, index: index});
+      pushActivePairTask(pair, task);
     };
 
-    $scope.taskBlur = function(pair, index) {
+    $scope.taskBlur = function(pair, task) {
       console.log('taskBlur');
+      if (removeActivePairTask(pair, task)) {
+        queueSaveTask(pair, task);
+      } else {
+        console.log('blurred task was not marked as active');
+      }
     };
 
-    $scope.deleteTask = function(pair, index) {
+    $scope.deleteTask = function(pair, task) {
       console.log('deleteTask');
-      var task = pair.tasks[index];
       queueDeleteTask(pair, task);
-      var newTaskId = getNewTaskId();
-      saveNewTask();
     };
 
-    $scope.toggleTask = function(pair, index) {
+    $scope.toggleTask = function(pair, task) {
       console.log('toggleTask');
-      var task = pair.tasks[index];
       task.done = !task.done;
       task.save().then(function(results) {
         if (allTasksDone(pair)) {

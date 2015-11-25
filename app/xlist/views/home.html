@@ -14,18 +14,18 @@
     <div ng-repeat="task in pair.tasks">
       <div class="item item-input">
         <div>
-          <a class="button button-icon icon" ng-click="toggleTask(pair, $index)" ng-class="{'super-ios-circle-outline': !task.done, 'super-checkmark-circled': task.done}"></a>
+          <a class="button button-icon icon" ng-click="toggleTask(pair, task)" ng-class="{'super-ios-circle-outline': !task.done, 'super-checkmark-circled': task.done}"></a>
         </div>
         <div class="task-list col col-75">
-          <textarea contenteditable="true" ng-model="task.name" placeholder="Tap to add item" ng-if="os == 'iOS'" ng-attr-id="task-{{pair.geoList.data.id}}-{{$index}}" ng-keydown="taskKey($event, pair, $index)" ng-focus="taskFocus(pair, $index)" ng-blur="taskBlur(pair, $index)" ng-style="{'text-decoration': task.done ? 'line-through' : 'none'}">{{ task.name }}</textarea>
-          <p contenteditable="true" placeholder="Tap to add item" ng-if="os != 'iOS'" ng-attr-id="task-{{pair.geoList.data.id}}-{{$index}}" ng-keydown="taskKey($event, pair, $index)" ng-focus="taskFocus(pair, $index)" ng-blur="taskBlur(pair, $index)" ng-style="{'text-decoration': task.done ? 'line-through' : 'none'}">{{ task.name }}</p>
+          <textarea contenteditable="true" ng-model="task.name" placeholder="Tap to add item" ng-if="os == 'iOS'" ng-attr-id="task-{{pair.geoList.data.id}}-{{task.data.uiid}}" ng-keydown="taskKey($event, pair, task)" ng-focus="taskFocus(pair, task)" ng-blur="taskBlur(pair, task)" ng-style="{'text-decoration': task.done ? 'line-through' : 'none'}">{{ task.name }}</textarea>
+          <p contenteditable="true" placeholder="Tap to add item" ng-if="os != 'iOS'" ng-attr-id="task-{{pair.geoList.data.id}}-{{task.data.uiid}}" ng-keydown="taskKey($event, pair, task)" ng-focus="taskFocus(pair, task)" ng-blur="taskBlur(pair, task)" ng-style="{'text-decoration': task.done ? 'line-through' : 'none'}">{{ task.name }}</p>
         </div>
         <div class="col col-10">
-          <a class="button button-small button-icon icon super-ios-close" ng-click="deleteTask(pair, $index)"></a>
+          <a class="button button-small button-icon icon super-ios-close" ng-click="deleteTask(pair, task)"></a>
         </div>
       </div>
     </div>
-    <button class="button button-block button-positive" ng-if="!activePairIndices.length" ng-click="addTask(pair)">Add Item</button>
+    <button class="button button-block button-positive" ng-if="!activePairTasks.length" ng-click="addTask(pair)">Add Item</button>
   </div>
   <div ng-if="pairs.length == 0">
     <h2>No lists found. Create one?</h2>
