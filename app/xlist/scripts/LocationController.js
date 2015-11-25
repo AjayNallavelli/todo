@@ -83,7 +83,7 @@ angular
     });
 
     supersonic.ui.navigationBar.update({
-      title: 'ToDo',
+      title: 'ToDo', //this is only while logo is blurry
       overrideBackButton: true,
       buttons: {
         left: [backButton]
