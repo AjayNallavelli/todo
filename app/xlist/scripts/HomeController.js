@@ -126,7 +126,7 @@ angular
         }).then(function() {
           if (newPairs.length === 0) {
             var newGeoPoint = new ParseObject(new GeoList(), GeoList.fields);
-            newGeoPoint.name = 'To-Do List';
+            newGeoPoint.name = 'Grocery List';
             newGeoPoint.location = new Parse.GeoPoint({
               latitude: 0.0,
               longitude: 0.0
