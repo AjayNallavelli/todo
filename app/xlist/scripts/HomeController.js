@@ -138,7 +138,7 @@ angular
           (task.data.uiid || task.data.id);
     };
 
-    var makeDebounceQueue = function(enqueue, dequeue, state, terminate) {
+    var makeDebounceQueue = function(enqueue, dequeue, terminate, state) {
       var queue = [];
       var debouncedFlush = _.debounce(function() {
         while (queue.length) {
@@ -148,7 +148,7 @@ angular
         if (terminate) {
           terminate(state);
         }
-      }, 250);
+      }, 100);
       return function() {
         queue.push(enqueue.apply(this, arguments));
         debouncedFlush();
@@ -162,15 +162,12 @@ angular
         function(dequeued) {
           var index = dequeued.pair.tasks.indexOf(dequeued.task);
           if (index >= 0) {
-            var task = dequeued.pair.tasks.splice(index, 1)[0];
-            // $scope.$apply(function($scope) {
-            //   var newTaskId = getNewTaskId();
-            //   if (newTaskId && taskId(dequeued.pair, index) === newTaskId) {
-            //     $scope.newPairIndex = null;
-            //   }
-            // });
-            if (!task.data.isNew()) {
-              task.delete().then(function() {
+            $scope.$apply(function($scope) {
+              dequeued.pair.tasks.splice(index, 1);
+            });
+            if (!dequeued.task
+              .data.isNew()) {
+              dequeued.task.delete().then(function() {
                 if (!dequeued.pair.tasks.length) {
                   congratsAlert();
                 }
@@ -217,9 +214,9 @@ angular
           } else {
             queueDeleteTask(pair, task);
           }
-        }, [], function(state) {
+        }, function(state) {
           state.splice(0, state.length);
-        });
+        }, []);
 
     var findActivePairTask = function(pair, task) {
       return _.findIndex($scope.activePairTasks, function(pairTask) {
@@ -237,9 +234,27 @@ angular
       var index = findActivePairTask(pair, task);
       if (index >= 0) {
         $scope.activePairTasks.splice(index, 1);
-        return true;
-      } else {
-        return false;
+        queueSaveTask(pair, task);
+      }
+    };
+
+    var clearActivePairTasks = function() {
+      while ($scope.activePairTasks.length) {
+        var pairTask = $scope.activePairTasks.shift();
+        queueSaveTask(pairTask.pair, pairTask.task);
+      }
+    };
+
+    var clearActivePairTasksExcluding = function(pair, task) {
+      var matched = 0;
+      while ($scope.activePairTasks.length - matched) {
+        var pairTask = $scope.activePairTasks[0];
+        if (pairTask.pair === pair && pairTask.task === task) {
+          matched++;
+        } else {
+          $scope.activePairTasks.shift();
+          queueSaveTask(pairTask.pair, pairTask.task);
+        }
       }
     };
 
@@ -259,26 +274,27 @@ angular
       console.log('taskKey');
       if ((event.keyCode || event.which) === 13) {
         event.preventDefault();
-        queueSaveTask(pair, task);
+        removeActivePairTask(pair, task);
       }
     };
 
     $scope.taskFocus = function(pair, task) {
       console.log('taskFocus');
       pushActivePairTask(pair, task);
+      clearActivePairTasksExcluding(pair, task);
     };
 
     $scope.taskBlur = function(pair, task) {
       console.log('taskBlur');
-      if (removeActivePairTask(pair, task)) {
-        queueSaveTask(pair, task);
-      } else {
-        console.log('blurred task was not marked as active');
-      }
+      removeActivePairTask(pair, task);
     };
 
     $scope.deleteTask = function(pair, task) {
       console.log('deleteTask');
+      if (document.activeElement) {
+        document.activeElement.blur();
+      }
+      clearActivePairTasks();
       queueDeleteTask(pair, task);
     };
 
