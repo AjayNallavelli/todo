@@ -135,6 +135,38 @@ angular
 
     $scope.reload = initialize;
 
+    /*
+    User presses add item, taps a field other than the new item -> The new todo
+        item is deleted (android, iphone)
+    User presses add item, taps the delete button of the new item -> The new
+        todo item is deleted (android, iphone)
+    User presses add item, taps the delete button of an item other than the new
+        item -> Both items are deleted (android, iphone)
+    User presses add item, taps new item field, taps a field other than the new
+        item -> The new todo item is deleted (android, iphone)
+    User presses add item, taps new item field, taps the delete button of the
+        new item -> The new todo item is deleted (android, iphone)
+    User presses add item, taps new item field, taps the delete button of an
+        item other than the new item-> Both items are deleted (android, iphone)
+    User presses add item, taps new item field, types, taps a field other than
+        the new item -> the new todo item is saved (android, iphone)
+    User presses add item, taps new item field, types, taps the delete button of
+        the new item -> The new todo item is deleted (item not
+        deleted in database on iphone and android)
+    User presses add item, taps new item field, types, taps the delete button of
+        an item other than the new item -> The new todo item is saved, the other
+        todo item is deleted (android, iphone)
+    User taps existing item field, backspaces entire text, taps a different
+        field -> The todo item is deleted (android, iphone)
+    User taps existing item field, backspaces entire text, taps the delete
+        button of a different item -> Both items are deleted (android, iphone)
+    User taps existing item field, types, taps a different field -> the todo
+        item is saved (android, iphone)
+    User taps existing item field, types, taps the delete button of a different
+        field -> the todo item is saved, he deleted the other item (android,
+        iphone)
+    */
+
     var taskId = function(pair, task) {
       return 'task-' + pair.geoList.data.id + '-' +
           (task.data.uiid || task.data.id);
