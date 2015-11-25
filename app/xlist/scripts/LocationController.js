@@ -83,7 +83,6 @@ angular
     });
 
     supersonic.ui.navigationBar.update({
-      title: 'ToDo',
       overrideBackButton: true,
       buttons: {
         left: [backButton]
