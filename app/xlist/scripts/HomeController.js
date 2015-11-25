@@ -134,7 +134,8 @@ angular
     };
 
     var taskId = function(pair, task) {
-      return 'task-' + pair.geoList.data.id + '-' + task.data.uiid;
+      return 'task-' + pair.geoList.data.id + '-' +
+          (task.data.uiid || task.data.id);
     };
 
     var makeDebounceQueue = function(enqueue, dequeue, state, terminate) {
