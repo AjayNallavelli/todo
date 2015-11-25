@@ -133,64 +133,111 @@ angular
       });
     };
 
-    $scope.addTask = function(pair) {
-      var newTask = new ParseObject(new Task(), Task.fields);
-      newTask.name = '';
-      newTask.category = '';
-      newTask.done = false;
-      newTask.geoList = pair.geoList.data.toPointer();
-      pair.tasks.push(newTask);
-      $scope.disableAdd = true;
+    var taskId = function(pair, index) {
+      return 'task-' + pair.geoList.data.id + '-' + index.toString();
     };
 
-    var saveTask = function(pair, index, taskContent) {
-      var task = pair.tasks[index];
-      task.name = (taskContent || task.name).trim();
+    var makeDebounceQueue = function(enqueue, dequeue) {
+      var queue = [];
+      var debouncedFlush = _.debounce(function() {
+        while (queue.length) {
+          var dequeued = queue.shift();
+          dequeue(dequeued);
+        }
+      }, 250);
+      return function() {
+        queue.push(enqueue.apply(this, arguments));
+        debouncedFlush();
+      };
+    };
 
-      if (task.name.length) {
+    var queueDeleteTask = makeDebounceQueue(
+        function(pair, task) {
+          return {pair: pair, task: task};
+        },
+        function(dequeued) {
+          var index = dequeued.pair.tasks.indexOf(dequeued.task);
+          if (index >= 0) {
+            var task = dequeued.pair.tasks.splice(index, 1)[0];
+            if (task.id !== dequeued.task.id) {
+              supersonic.ui.dialog.alert('Encountered error deleting task.');
+            }
+            task.delete().then(function() {
+              if (!dequeued.pair.tasks.length) {
+                congratsAlert();
+              }
+            }, alertParseError);
+          }
+        });
+
+    var saveTask = function(pair, index) {
+      var task = pair.tasks[index];
+      var element = document.getElementById(taskId(pair, index));
+      console.log(element.tagName);
+      var newName =
+          (element.tagName === 'P' ? element.innerText : element.value).trim();
+      console.log(newName);
+      if (newName.length) {
+        task.name = newName;
+        if (element.tagName === 'P') {
+          element.innerText = newName;
+        }
         task.done = false;
-        task.save().catch(alertParseError);
+        task.save().then(function() {
+          console.log(document.activeElement.id, element.id);
+          if (document.activeElement.id === element.id) {
+            element.blur();
+          }
+        }, alertParseError);
       } else {
-        $scope.deleteTask(pair, index);
+        queueDeleteTask(pair, task);
       }
       $scope.disableAdd = false;
     };
 
-    $scope.taskEnter = function(event, pair, index) {
-      if (event.which === 13) {
-        event.preventDefault();
-        var taskElement = document.getElementById(
-            'task-' + pair.geoList.data.id + '-' + index.toString());
+    $scope.addTask = function(pair) {
+      console.log('addTask');
+      var task = new ParseObject(new Task(), Task.fields);
+      task.name = '';
+      task.category = '';
+      task.done = false;
+      task.geoList = pair.geoList.data.toPointer();
+      task.save().then(function() {
+        pair.tasks.push(task);
+      }, alertParseError);
+    };
 
-        var taskContent = taskElement.innerText;
-        saveTask(pair, index, taskContent);
-        taskElement.innerText = taskContent;
-        taskElement.blur();
+    $scope.taskKey = function(event, pair, index) {
+      console.log('taskKey');
+      if ((event.keyCode || event.which) === 13) {
+        event.preventDefault();
+        saveTask(pair, index);
       }
+    };
+
+    $scope.taskFocus = function(pair, index) {
+      console.log('taskFocus');
+    };
+
+    $scope.taskBlur = function(pair, index) {
+      console.log('taskBlur');
     };
 
     $scope.deleteTask = function(pair, index) {
-      if (index == pair.tasks.length - 1 && $scope.disableAdd) {
-        pair.tasks.splice(index, 1);
-        $scope.disableAdd = false;
-      } else {
-        pair.tasks[index].delete().then(function(result) {
-          pair.tasks.splice(index, 1);
-          if (pair.tasks.length === 0) {
-            congratsAlert();
-          }
-        }, alertParseError);
-      }
+      console.log('deleteTask');
+      var task = pair.tasks[index];
+      queueDeleteTask(pair, task);
     };
 
-    $scope.toggleTask = function(pair, task) {
+    $scope.toggleTask = function(pair, index) {
+      console.log('toggleTask');
+      var task = pair.tasks[index];
       task.done = !task.done;
-      task.save()
-        .then(function(results) {
-          if (allTasksDone(pair)) {
-            congratsAlert();
-          }
-        }, alertParseError);
+      task.save().then(function(results) {
+        if (allTasksDone(pair)) {
+          congratsAlert();
+        }
+      }, alertParseError);
     };
 
     var congratsAlert = function() {
