@@ -133,20 +133,22 @@ angular
       });
     };
 
+    $scope.reload = initialize;
+
     var taskId = function(pair, task) {
       return 'task-' + pair.geoList.data.id + '-' +
           (task.data.uiid || task.data.id);
     };
 
-    var makeDebounceQueue = function(enqueue, dequeue, terminate, state) {
+    var makeDebounceQueue = function(enqueue, dequeue, terminate) {
       var queue = [];
       var debouncedFlush = _.debounce(function() {
         while (queue.length) {
           var dequeued = queue.shift();
-          dequeue(dequeued, state);
+          dequeue(dequeued);
         }
         if (terminate) {
-          terminate(state);
+          terminate();
         }
       }, 100);
       return function() {
@@ -165,8 +167,7 @@ angular
             $scope.$apply(function($scope) {
               dequeued.pair.tasks.splice(index, 1);
             });
-            if (!dequeued.task
-              .data.isNew()) {
+            if (!dequeued.task.data.isNew()) {
               dequeued.task.delete().then(function() {
                 if (!dequeued.pair.tasks.length) {
                   congratsAlert();
@@ -181,6 +182,8 @@ angular
           .trim();
     };
 
+    var alreadySaved = [];
+
     var queueSaveTask = makeDebounceQueue(
         function(pair, task) {
           return {pair: pair, task: task};
@@ -188,13 +191,12 @@ angular
         function(dequeued, state) {
           var pair = dequeued.pair;
           var task = dequeued.task;
-          if (state.indexOf(task.data.id) < 0) {
-            state.push(task.data.id);
+          if (alreadySaved.indexOf(task.data.id) < 0) {
+            alreadySaved.push(task.data.id);
           } else {
             console.log('already saved in this flush');
             return;
           }
-          console.log(taskId(pair, task));
           var element = document.getElementById(taskId(pair, task));
           var newName = hybridFieldValue(element);
           if (newName.length) {
@@ -206,7 +208,6 @@ angular
               task.done = false;
             });
             task.save().then(function() {
-              console.log(document.activeElement.id, element.id);
               if (document.activeElement.id === element.id) {
                 element.blur();
               }
@@ -214,9 +215,9 @@ angular
           } else {
             queueDeleteTask(pair, task);
           }
-        }, function(state) {
-          state.splice(0, state.length);
-        }, []);
+        }, function() {
+          alreadySaved.splice(0, alreadySaved.length);
+        });
 
     var findActivePairTask = function(pair, task) {
       return _.findIndex($scope.activePairTasks, function(pairTask) {
@@ -259,7 +260,6 @@ angular
     };
 
     $scope.addTask = function(pair) {
-      console.log('addTask');
       var task = new ParseObject(new Task(), Task.fields);
       task.name = '';
       task.category = '';
@@ -271,7 +271,6 @@ angular
     };
 
     $scope.taskKey = function(event, pair, task) {
-      console.log('taskKey');
       if ((event.keyCode || event.which) === 13) {
         event.preventDefault();
         removeActivePairTask(pair, task);
@@ -279,18 +278,15 @@ angular
     };
 
     $scope.taskFocus = function(pair, task) {
-      console.log('taskFocus');
       pushActivePairTask(pair, task);
       clearActivePairTasksExcluding(pair, task);
     };
 
     $scope.taskBlur = function(pair, task) {
-      console.log('taskBlur');
       removeActivePairTask(pair, task);
     };
 
     $scope.deleteTask = function(pair, task) {
-      console.log('deleteTask');
       if (document.activeElement) {
         document.activeElement.blur();
       }
@@ -299,7 +295,6 @@ angular
     };
 
     $scope.toggleTask = function(pair, task) {
-      console.log('toggleTask');
       task.done = !task.done;
       task.save().then(function(results) {
         if (allTasksDone(pair)) {
