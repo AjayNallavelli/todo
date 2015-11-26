@@ -101,11 +101,12 @@ angular
         var queryGeoLists = new Parse.Query(GeoList)
             .equalTo('uuid', device.uuid);
         queryGeoLists.each(function(geoList) {
+          var pair = {
+            geoList: new ParseObject(geoList, GeoList.fields),
+          };
+          newPairs.push(pair);
           getTasks(geoList).then(function(tasks) {
-            newPairs.push({
-              geoList: new ParseObject(geoList, GeoList.fields),
-              tasks: tasks
-            });
+            pair.tasks = tasks;
           });
         }).then(function() {
           if (!newPairs.length) {
@@ -119,8 +120,10 @@ angular
               });
             }).catch(alertParseError);
           } else {
-            $scope.pairs = _.sortBy(newPairs, function(pair) {
-              return pair.geoList.name.toLowerCase();
+            $scope.$apply(function($scope) {
+              $scope.pairs = _.sortBy(newPairs, function(pair) {
+                return pair.geoList.name.toLowerCase();
+              });
             });
           }
         });
