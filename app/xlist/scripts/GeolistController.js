@@ -1,6 +1,6 @@
 angular
   .module('xlist')
-  .controller('GeolistController',
+  .controller('GeoListController',
       ['$scope', '$q', 'supersonic', 'GeoList', 'locationService',
        'deviceReady', 'slackbot', 'push', 'ParseObject',
   function($scope, $q, supersonic, GeoList, locationService, deviceReady,
