@@ -1,9 +1,9 @@
 angular
   .module('xlist')
   .controller('GeoListController',
-      ['$scope', '$q', 'supersonic', 'GeoList', 'locationService',
+      ['$scope', '$q', 'supersonic', 'GeoList', 'Task', 'locationService',
        'deviceReady', 'slackbot', 'push', 'ParseObject',
-  function($scope, $q, supersonic, GeoList, locationService, deviceReady,
+  function($scope, $q, supersonic, GeoList, Task, locationService, deviceReady,
            slackbot, push, ParseObject) {
     $scope.pairs = [];
 
@@ -108,22 +108,25 @@ angular
             });
           });
         }).then(function() {
-          if (!newGeoLists.length) {
-            var newGeoList = new ParseObject(new GeoList(), GeoList.fields);
-            newGeoList.name = 'Grocery List';
-            newGeoList.location = new Parse.GeoPoint({
+          if (!newPairs.length) {
+            var defaultGeoList = new ParseObject(new GeoList(), GeoList.fields);
+            defaultGeoList.name = 'Grocery List';
+            defaultGeoList.location = new Parse.GeoPoint({
               latitude: 0.0,
               longitude: 0.0
             });
-            newGeoList.uuid = device.uuid;
-            newGeoList.address = '';
-            newGeoList.storeName = '';
-            newGeoList.save().then(function() {
-              $scope.geoLists.push(newGeoList);
+            defaultGeoList.uuid = device.uuid;
+            defaultGeoList.address = '';
+            defaultGeoList.storeName = '';
+            defaultGeoList.save().then(function() {
+              $scope.pairs.push({
+                geoList: defaultGeoList,
+                tasks: []
+              });
             }).catch(alertParseError);
           } else {
-            $scope.geoLists = _.sortBy(newGeoLists, function(geoList) {
-              return geoList.name.toLowerCase();
+            $scope.pairs = _.sortBy(newPairs, function(pair) {
+              return pair.geoList.name.toLowerCase();
             });
           }
         });
