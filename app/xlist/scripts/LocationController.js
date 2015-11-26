@@ -10,7 +10,10 @@ angular
         latitude: 0,
         longitude: 0
       },
-      zoom: 16
+      zoom: 16,
+      options: {
+        streetViewControl: false
+      }
     };
     $scope.markers = [];
 
@@ -80,7 +83,7 @@ angular
     });
 
     supersonic.ui.navigationBar.update({
-      title: 'ToDo',
+      title: 'ToDo', //this is only while logo is blurry
       overrideBackButton: true,
       buttons: {
         left: [backButton]
