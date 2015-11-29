@@ -72,6 +72,30 @@ angular
       });
     };
 
+    $scope.deleteGeoList = function(pair) {
+      var taskCount = _.countBy(pair.tasks, function(task) {
+        return task.done ? 'true' : 'false';
+      });
+      var confirmTitle = 'Are you sure you want to delete this list?';
+      var confirmMessage = 'You have ' + (taskCount.false || 0) +
+      ' incomplete tasks on this list';
+
+      var options = {
+        message: confirmMessage,
+        buttonLabels: ['Yes', 'No']
+      };
+      supersonic.ui.dialog.confirm(confirmTitle, options).then(function(index) {
+        if (index === 0) {
+          pair.geoList.delete().then(function() {
+            var geoListIndex = $scope.pairs.indexOf(pair);
+            if (geoListIndex > -1) {
+              $scope.pairs.splice(geoListIndex, 1);
+            }
+          }, alertParseError);
+        }
+      });
+    };
+
     var pushNear = function(pair) {
       var now = new Date().getTime();
       var nextNotification = pair.geoList.nextNotification;

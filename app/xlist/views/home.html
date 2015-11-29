@@ -6,14 +6,18 @@
     </super-navbar-button>
   </super-navbar>
 
-  <ul class="list">
-    <super-navigate location="xlist#list" ng-repeat="pair in pairs" data-params-id="{{ pair.geoList.data.id }}">
-      <li class="item">
-        <h2>{{ pair.geoList.name }}</h2>
-        <p>{{ pair.geoList.storeName }}</p>
-        <p>{{ pair.geoList.address }}</p>
-      </li>
-    </super-navigate>
-  </ul>
-  <!-- <button class="button button-block button-positive" ng-click="setLocation()">Simulate Location</button> -->
+  <div ng-repeat="pair in pairs">
+    <div class="item row">
+      <div class="col col-90">
+        <super-navigate location="xlist#list" data-params-id="{{ pair.geoList.data.id }}">
+          <h2>{{ pair.geoList.name }}</h2>
+          <p>{{ pair.geoList.storeName }}</p>
+          <p>{{ pair.geoList.address }}</p>
+        </super-navigate>
+      </div>
+      <div class="col col-10 col-center">
+        <button class="button button-small button-icon icon super-ios-close" style="line-height: 0px;" ng-click="deleteGeoList(pair)"></button>
+      </div>
+    </div>
+  </div>
 </div>
