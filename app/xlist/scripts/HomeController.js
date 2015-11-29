@@ -48,6 +48,30 @@ angular
       });
     };
 
+    $scope.addGeoList = function() {
+      supersonic.ui.dialog.prompt('Add a new list', {
+        message: 'Enter the name for the new list'
+      }).then(function(result) {
+        if (result.buttonIndex === 0) {
+          var newGeoList = new ParseObject(new GeoList(), GeoList.fields);
+          newGeoList.name = result.input;
+          newGeoList.uuid = device.uuid;
+          newGeoList.save().then(function() {
+            $scope.pairs.push({
+              geoList: newGeoList,
+              tasks: []
+            });
+            var locationView = new supersonic.ui.View('xlist#location');
+            supersonic.ui.layers.push(locationView, {
+              params: {
+                id: newGeoList.data.id
+              }
+            });
+          }).catch(alertParseError);
+        }
+      });
+    };
+
     var pushNear = function(pair) {
       var now = new Date().getTime();
       var nextNotification = pair.geoList.nextNotification;
@@ -59,7 +83,8 @@ angular
         }).length;
         if (incomplete) {
           var message = 'Pick up ' + incomplete + ' item' +
-              (incomplete > 1 ? 's' : '') + ' from your ' + pair.geoList.name + '.';
+              (incomplete > 1 ? 's' : '') + ' from your ' + pair.geoList.name +
+              '.';
           push.send({
             title: 'ToDo',
             message: message
