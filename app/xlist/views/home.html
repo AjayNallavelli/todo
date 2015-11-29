@@ -11,8 +11,10 @@
       <div class="col col-90">
         <super-navigate location="xlist#list" data-params-id="{{ pair.geoList.data.id }}">
           <h2>{{ pair.geoList.name }}</h2>
-          <p>{{ pair.geoList.storeName }}</p>
-          <p>{{ pair.geoList.address }}</p>
+          <p ng-hide="pair.geoList.storeName || pair.geoList.address">Tap to add store location</p>
+          <p ng-show="pair.geoList.storeName">{{ pair.geoList.storeName }}</p>
+          <p ng-show="pair.geoList.address">{{ pair.geoList.address }}</p>
+          <p>{{ pair.completeTasks }} completed tasks | {{ pair.incompleteTasks }} incomplete tasks</p>
         </super-navigate>
       </div>
       <div class="col col-10 col-center">

@@ -59,7 +59,9 @@ angular
           newGeoList.save().then(function() {
             $scope.pairs.push({
               geoList: newGeoList,
-              tasks: []
+              tasks: [],
+              completeTasks: 0,
+              incompleteTasks: 0
             });
             var locationView = new supersonic.ui.View('xlist#location');
             supersonic.ui.layers.push(locationView, {
@@ -74,10 +76,10 @@ angular
 
     $scope.deleteGeoList = function(pair) {
       var taskCount = _.countBy(pair.tasks, function(task) {
-        return task.done ? 'true' : 'false';
+        return task.done ? 'complete' : 'incomplete';
       });
       var confirmTitle = 'Are you sure you want to delete this list?';
-      var confirmMessage = 'You have ' + (taskCount.false || 0) +
+      var confirmMessage = 'You have ' + (taskCount.incomplete || 0) +
       ' incomplete tasks on this list';
 
       var options = {
@@ -156,6 +158,11 @@ angular
           newPairs.push(pair);
           getTasks(geoList).then(function(tasks) {
             pair.tasks = tasks;
+            var taskCount = _.countBy(pair.tasks, function(task) {
+              return task.done ? 'complete' : 'incomplete';
+            });
+            pair.completeTasks = (taskCount.complete || 0);
+            pair.incompleteTasks = (taskCount.incomplete || 0);
           });
         }).then(function() {
           if (!newPairs.length) {
@@ -165,7 +172,9 @@ angular
             defaultGeoList.save().then(function() {
               $scope.pairs.push({
                 geoList: defaultGeoList,
-                tasks: []
+                tasks: [],
+                completeTasks: 0,
+                incompleteTasks: 0
               });
             }).catch(alertParseError);
           } else {
