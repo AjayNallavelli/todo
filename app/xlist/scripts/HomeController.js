@@ -124,9 +124,10 @@ angular
 
     var findNearAndPassLocation = function(location) {
       _.each($scope.pairs, function(pair) {
-        var distance = getDistance(location, pair.geoList.location);
-        if (distance < THRESHOLD) {
-          pushNear(pair);
+        if (pair.geoList.location) {
+          if (getDistance(location, pair.geoList.location) < THRESHOLD) {
+            pushNear(pair);
+          }
         }
       });
     };
