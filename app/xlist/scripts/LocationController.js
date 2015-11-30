@@ -1,9 +1,9 @@
 angular
   .module('xlist')
   .controller('LocationController',
-      ['$scope', 'supersonic', 'deviceReady', 'locationService', 'GeoList',
+      ['$scope', 'supersonic', 'locationService', 'GeoList',
        'uiGmapGoogleMapApi',
-  function($scope, supersonic, deviceReady, locationService, GeoList,
+  function($scope, supersonic, locationService, GeoList,
            uiGmapGoogleMapApi) {
     $scope.map = {
       center: {
@@ -19,16 +19,22 @@ angular
 
     var geoList = null;
 
+    var alertParseError = function(error) {
+      supersonic.ui.dialog.alert('Error: ' + error.code + ' ' + error.message);
+    };
+
+    var setView = function(coords) {
+      $scope.map.center.latitude = coords.latitude;
+      $scope.map.center.longitude = coords.longitude;
+    };
+
     var setLocation = function(coords, locationDetails) {
       $scope.markers = [{
         id: 'id',
         coords: coords,
         locationDetails: locationDetails
       }];
-      $scope.$apply(function($scope) {
-        $scope.map.center.latitude = coords.latitude;
-        $scope.map.center.longitude = coords.longitude;
-      });
+      setView(coords);
     };
 
     var placesChanged = function(searchBox) {
@@ -42,12 +48,14 @@ angular
       address = address.substring(0, address.lastIndexOf(','));
       // jscs:enable requireCamelCaseOrUpperCaseIdentifiers
 
-      setLocation({
-        latitude: place.geometry.location.lat(),
-        longitude: place.geometry.location.lng()
-      }, {
-        address: address,
-        storeName: place.name
+      $scope.$apply(function($scope) {
+        setLocation({
+          latitude: place.geometry.location.lat(),
+          longitude: place.geometry.location.lng()
+        }, {
+          address: address,
+          storeName: place.name
+        });
       });
     };
 
@@ -98,16 +106,17 @@ angular
         queryGeoLists.get(params.id).then(function(result) {
           geoList = result;
           var location = geoList.get('location');
-          var address = geoList.get('address');
-          var storeName = geoList.get('storeName');
-          setLocation({
-            latitude: location.latitude,
-            longitude: location.longitude
-          }, {
-            address: address,
-            storeName: storeName
-          });
-        }).then(function() {
+          if (location) {
+            setLocation({
+              latitude: location.latitude,
+              longitude: location.longitude
+            }, {
+              address: geoList.get('address'),
+              storeName: geoList.get('storeName')
+            });
+          } else {
+            locationService.get().then(setView);
+          }
           locationService.get().then(setBounds).then(function() {
             locationService.watch(setBounds);
           });

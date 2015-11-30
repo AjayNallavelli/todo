@@ -1,0 +1,38 @@
+<div ng-controller="ListController">
+  <super-navbar>
+    <super-navbar-title>ToDo</super-navbar-title>
+  </super-navbar>
+
+  <div class="card" ng-if="pairs.length != 0" ng-repeat="pair in pairs">
+    <super-navigate location="xlist#location" data-params-id="{{ pair.geoList.data.id }}">
+      <div class="item item-divider">
+        <div class="row">
+          <div class="col col-90">
+            {{ pair.geoList.name }}
+            <p ng-hide="pair.geoList.storeName || pair.geoList.address">Tap to add store location</p>
+            <p ng-show="pair.geoList.storeName">{{ pair.geoList.storeName }}</p>
+            <p ng-show="pair.geoList.address">{{ pair.geoList.address }}</p>
+          </div>
+          <div class="col col-center">
+            <button class="button button-small button-icon icon super-edit" style="line-height: 0px;"></button>
+          </div>
+        </div>
+      </div>
+    </super-navigate>
+    <div ng-repeat="task in pair.tasks">
+      <div class="item item-input">
+        <div>
+          <a class="button button-icon icon" ng-click="toggleTask(pair, task)" ng-class="{'super-ios-circle-outline': !task.done, 'super-checkmark-circled': task.done}"></a>
+        </div>
+        <div class="task-list col col-75">
+          <textarea contenteditable="true" ng-model="task.name" placeholder="Tap to add" ng-if="os == 'iOS'" ng-attr-id="task-{{pair.geoList.data.id}}-{{task.data.uiid || task.data.id}}" ng-keydown="taskKey($event, pair, task)" ng-focus="taskFocus(pair, task)" ng-blur="taskBlur(pair, task)" ng-style="{'text-decoration': task.done ? 'line-through' : 'none'}">{{ task.name }}</textarea>
+          <p contenteditable="true" placeholder="Tap to add" ng-if="os != 'iOS'" ng-attr-id="task-{{pair.geoList.data.id}}-{{task.data.uiid || task.data.id}}" ng-keydown="taskKey($event, pair, task)" ng-focus="taskFocus(pair, task)" ng-blur="taskBlur(pair, task)" ng-style="{'text-decoration': task.done ? 'line-through' : 'none'}">{{ task.name }}</p>
+        </div>
+        <div class="col col-10">
+          <a class="button button-small button-icon icon super-ios-close" ng-click="deleteTask(pair, task)"></a>
+        </div>
+      </div>
+    </div>
+    <button class="button button-block button-positive" ng-if="!activePairTasks.length" ng-click="addTask(pair)">ADD ITEM</button>
+  </div>
+</div>
