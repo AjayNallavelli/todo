@@ -59,12 +59,11 @@ angular
     User presses add item, taps new item field, taps the delete button of the
         new item -> The new todo item is deleted (android, iphone)
     User presses add item, taps new item field, taps the delete button of an
-        item other than the new item-> Both items are deleted (android, iphone)
+        item other than the new item -> Both items are deleted (android, iphone)
     User presses add item, taps new item field, types, taps a field other than
         the new item -> the new todo item is saved (android, iphone)
     User presses add item, taps new item field, types, taps the delete button of
-        the new item -> The new todo item is deleted (item not
-        deleted in database on iphone and android)
+        the new item -> The new todo item is deleted (android, iphone)
     User presses add item, taps new item field, types, taps the delete button of
         an item other than the new item -> The new todo item is saved, the other
         todo item is deleted (android, iphone)
@@ -151,11 +150,13 @@ angular
               }
               task.done = false;
             });
-            task.save().then(function() {
-              if (document.activeElement.id === element.id) {
-                element.blur();
-              }
-            }, alertParseError);
+            if (!task.data.deleteFlag) {
+              task.save().then(function() {
+                if (document.activeElement.id === element.id) {
+                  element.blur();
+                }
+              }, alertParseError);
+            }
           } else {
             queueDeleteTask(pair, task);
           }
@@ -234,6 +235,7 @@ angular
       if (document.activeElement) {
         document.activeElement.blur();
       }
+      task.data.deleteFlag = true;
       clearActivePairTasks();
       queueDeleteTask(pair, task);
     };
@@ -247,13 +249,13 @@ angular
       }, alertParseError);
     };
 
-    var congratsAlert = function() {
+    var congratsAlert = _.debounce(function() {
       var options = {
         message: 'You\'ve finished all your tasks!',
         buttonLabel: 'Hooray!'
       };
       supersonic.ui.dialog.alert('Congratulations!', options);
-    };
+    }, 250);
 
     var allTasksDone = function(pair) {
       return _.every(pair.tasks, function(task) {
