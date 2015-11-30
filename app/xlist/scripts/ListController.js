@@ -1,8 +1,9 @@
 angular
   .module('xlist')
   .controller('ListController',
-      ['$scope', '$q', 'supersonic', 'GeoList', 'Task', 'ParseObject',
-  function($scope, $q, supersonic, GeoList, Task, ParseObject) {
+      ['$scope', '$q', 'supersonic', 'reloadTrigger', 'GeoList', 'Task',
+       'ParseObject',
+  function($scope, $q, supersonic, reloadTrigger, GeoList, Task, ParseObject) {
     $scope.pairs = [];
     $scope.activePairTasks = [];
     $scope.os = '';
@@ -280,7 +281,28 @@ angular
       }
     };
 
+    var back = function() {
+      reloadTrigger.trigger();
+      supersonic.ui.layers.pop();
+    };
+
+    var backButton = new supersonic.ui.NavigationBarButton({
+      title: 'Back',
+      onTap: back
+    });
+
+    supersonic.ui.navigationBar.update({
+      title: 'ToDo', //this is only while logo is blurry
+      overrideBackButton: true,
+      buttons: {
+        left: [backButton]
+      }
+    });
+
+    supersonic.device.buttons.back.whenPressed(back);
+
     $scope.os = getMobileOperatingSystem();
 
-    supersonic.ui.views.current.whenVisible(initialize);
+    reloadTrigger.bind(initialize);
+    angular.element(document).ready(initialize);
   }]);
