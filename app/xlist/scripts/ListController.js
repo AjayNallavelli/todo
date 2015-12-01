@@ -39,8 +39,12 @@ angular
             });
           });
         }).then(function() {
+          if (document.activeElement) {
+            document.activeElement.blur();
+          }
           $scope.$apply(function($scope) {
             $scope.pairs = newPairs;
+            $scope.activePairTasks = [];
           });
         });
       });
