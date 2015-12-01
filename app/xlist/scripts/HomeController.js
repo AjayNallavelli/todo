@@ -2,9 +2,9 @@ angular
   .module('xlist')
   .controller('HomeController',
       ['$scope', '$q', 'supersonic', 'GeoList', 'Task', 'locationService',
-       'deviceReady', 'slackbot', 'push', 'ParseObject',
+       'deviceReady', 'reloadTrigger', 'slackbot', 'push', 'ParseObject',
   function($scope, $q, supersonic, GeoList, Task, locationService, deviceReady,
-           slackbot, push, ParseObject) {
+           reloadTrigger, slackbot, push, ParseObject) {
     $scope.pairs = [];
 
     $scope.showFakeNavbar = false;
@@ -194,7 +194,8 @@ angular
       });
     };
 
-    supersonic.ui.views.current.whenVisible(initialize);
+    reloadTrigger.bind(initialize);
+    angular.element(document).ready(initialize);
 
     deviceReady().then(function() {
       if (cordova.plugins.backgroundMode) {

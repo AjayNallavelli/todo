@@ -1,9 +1,9 @@
 angular
   .module('xlist')
   .controller('LocationController',
-      ['$scope', 'supersonic', 'locationService', 'GeoList',
+      ['$scope', 'supersonic', 'locationService', 'reloadTrigger', 'GeoList',
        'uiGmapGoogleMapApi',
-  function($scope, supersonic, locationService, GeoList,
+  function($scope, supersonic, locationService, reloadTrigger, GeoList,
            uiGmapGoogleMapApi) {
     $scope.map = {
       center: {
@@ -73,16 +73,16 @@ angular
 
     window.customBack = function() {
       if (geoList && $scope.markers.length) {
-        console.log($scope.markers[0]);
-
         geoList.save({
           location: new Parse.GeoPoint($scope.markers[0].coords),
           address: $scope.markers[0].locationDetails.address,
           storeName: $scope.markers[0].locationDetails.storeName
         }).then(function() {
+          reloadTrigger.trigger();
           supersonic.ui.layers.pop();
         });
       } else {
+        reloadTrigger.trigger();
         supersonic.ui.layers.pop();
       }
     };

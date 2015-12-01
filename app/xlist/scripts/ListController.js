@@ -1,20 +1,14 @@
 angular
   .module('xlist')
   .controller('ListController',
-      ['$scope', '$q', 'supersonic', 'GeoList', 'Task', 'ParseObject',
-  function($scope, $q, supersonic, GeoList, Task, ParseObject) {
+      ['$scope', '$q', 'supersonic', 'reloadTrigger', 'GeoList', 'Task',
+       'ParseObject',
+  function($scope, $q, supersonic, reloadTrigger, GeoList, Task, ParseObject) {
     $scope.pairs = [];
     $scope.activePairTasks = [];
     $scope.os = '';
 
     $scope.showFakeNavbar = false;
-    supersonic.ui.navigationBar.hide().then(function() {
-      $scope.showFakeNavbar = true;
-    });
-
-    $scope.back = function() {
-      supersonic.ui.layers.pop();
-    };
 
     var alertParseError = function(error) {
       supersonic.ui.dialog.alert('Error: ' + error.code + ' ' + error.message);
@@ -47,8 +41,12 @@ angular
             });
           });
         }).then(function() {
+          if (document.activeElement) {
+            document.activeElement.blur();
+          }
           $scope.$apply(function($scope) {
             $scope.pairs = newPairs;
+            $scope.activePairTasks = [];
           });
         });
       });
@@ -68,12 +66,11 @@ angular
     User presses add item, taps new item field, taps the delete button of the
         new item -> The new todo item is deleted (android, iphone)
     User presses add item, taps new item field, taps the delete button of an
-        item other than the new item-> Both items are deleted (android, iphone)
+        item other than the new item -> Both items are deleted (android, iphone)
     User presses add item, taps new item field, types, taps a field other than
         the new item -> the new todo item is saved (android, iphone)
     User presses add item, taps new item field, types, taps the delete button of
-        the new item -> The new todo item is deleted (item not
-        deleted in database on iphone and android)
+        the new item -> The new todo item is deleted (android, iphone)
     User presses add item, taps new item field, types, taps the delete button of
         an item other than the new item -> The new todo item is saved, the other
         todo item is deleted (android, iphone)
@@ -160,11 +157,13 @@ angular
               }
               task.done = false;
             });
-            task.save().then(function() {
-              if (document.activeElement.id === element.id) {
-                element.blur();
-              }
-            }, alertParseError);
+            if (!task.data.deleteFlag) {
+              task.save().then(function() {
+                if (document.activeElement.id === element.id) {
+                  element.blur();
+                }
+              }, alertParseError);
+            }
           } else {
             queueDeleteTask(pair, task);
           }
@@ -243,6 +242,7 @@ angular
       if (document.activeElement) {
         document.activeElement.blur();
       }
+      task.data.deleteFlag = true;
       clearActivePairTasks();
       queueDeleteTask(pair, task);
     };
@@ -256,13 +256,13 @@ angular
       }, alertParseError);
     };
 
-    var congratsAlert = function() {
+    var congratsAlert = _.debounce(function() {
       var options = {
         message: 'You\'ve finished all your tasks!',
         buttonLabel: 'Hooray!'
       };
       supersonic.ui.dialog.alert('Congratulations!', options);
-    };
+    }, 250);
 
     var allTasksDone = function(pair) {
       return _.every(pair.tasks, function(task) {
@@ -289,7 +289,19 @@ angular
       }
     };
 
+    $scope.back = function() {
+      reloadTrigger.trigger();
+      supersonic.ui.layers.pop();
+    };
+
+    supersonic.ui.navigationBar.hide().then(function() {
+      $scope.showFakeNavbar = true;
+    });
+
+    supersonic.device.buttons.back.whenPressed($scope.back);
+
     $scope.os = getMobileOperatingSystem();
 
-    supersonic.ui.views.current.whenVisible(initialize);
+    reloadTrigger.bind(initialize);
+    angular.element(document).ready(initialize);
   }]);
