@@ -49,12 +49,29 @@ html, body {
 .fake-navbar {
   height: 45px;
   background-color: #00B5FF !important;
+  position: relative;
 }
 
 .fake-navbar-button {
+  position: absolute;
+  top: 0;
   height: 45px;
   color: #fff;
   background-color: #00B5FF !important;
   border: none;
   font-size: 17px;
+}
+
+.fake-left-button {
+  left: 0;
+}
+
+.fake-right-button {
+  right: 0;
+}
+
+.fake-navbar-logo {
+  display: block;
+  margin: 0 auto;
+  padding: 5px;
 }

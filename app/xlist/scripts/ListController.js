@@ -11,10 +11,10 @@ angular
     supersonic.ui.navigationBar.hide().then(function() {
       $scope.showFakeNavbar = true;
     });
-    
+
     $scope.back = function() {
       supersonic.ui.layers.pop();
-    }
+    };
 
     var alertParseError = function(error) {
       supersonic.ui.dialog.alert('Error: ' + error.code + ' ' + error.message);

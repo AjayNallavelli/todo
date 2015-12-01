@@ -31,8 +31,6 @@ angular
     };
 
     var setLocation = function(coords, locationDetails) {
-      console.log(coords);
-      console.log(locationDetails);
       $scope.markers = [{
         id: 'id',
         coords: coords,
