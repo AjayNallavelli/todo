@@ -53,4 +53,8 @@ html, body {
 
 .fake-navbar-button {
   height: 45px;
+  color: #fff;
+  background-color: #00B5FF !important;
+  border: none;
+  font-size: 17px;
 }
