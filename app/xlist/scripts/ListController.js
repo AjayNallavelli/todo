@@ -249,10 +249,25 @@ angular
 
     var congratsAlert = function() {
       var options = {
-        message: 'You\'ve finished all your tasks!',
-        buttonLabel: 'Hooray!'
+        message: 'You\'ve finished all of your tasks! ' +
+          'Would you like to clear your to-do list?',
+        buttonLabels: ['Yes', 'No']
       };
-      supersonic.ui.dialog.alert('Congratulations!', options);
+
+      supersonic.ui.dialog.confirm('Congratulations!', options)
+        .then(function(index) {
+          console.log($scope.pairs[0].tasks.length);
+          if (index === 0 && $scope.pairs[0].tasks.length) {
+            var tasksToDelete = $scope.pairs[0].tasks;
+            _.defer(function() {
+              _.each(tasksToDelete, function(task) {
+                task.delete();
+              });
+            });
+
+            $scope.pairs[0].tasks = [];
+          }
+        }, alertParseError);
     };
 
     var allTasksDone = function(pair) {
