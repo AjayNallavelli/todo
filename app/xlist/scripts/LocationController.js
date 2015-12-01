@@ -17,6 +17,8 @@ angular
     };
     $scope.markers = [];
 
+    $scope.showFakeNavbar = false;
+
     var geoList = null;
 
     var alertParseError = function(error) {
@@ -69,7 +71,7 @@ angular
       options: {}
     };
 
-    var back = function() {
+    window.customBack = function() {
       if (geoList && $scope.markers.length) {
         geoList.save({
           location: new Parse.GeoPoint($scope.markers[0].coords),
@@ -85,20 +87,11 @@ angular
       }
     };
 
-    var backButton = new supersonic.ui.NavigationBarButton({
-      title: 'Save',
-      onTap: back
+    supersonic.ui.navigationBar.hide().then(function() {
+      $scope.showFakeNavbar = true;
     });
 
-    supersonic.ui.navigationBar.update({
-      title: 'ToDo', //this is only while logo is blurry
-      overrideBackButton: true,
-      buttons: {
-        left: [backButton]
-      }
-    });
-
-    supersonic.device.buttons.back.whenPressed(back);
+    supersonic.device.buttons.back.whenPressed(window.customBack);
 
     var getGeoList = function() {
       supersonic.ui.views.current.params.onValue(function(params) {

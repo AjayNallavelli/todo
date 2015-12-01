@@ -8,6 +8,8 @@ angular
     $scope.activePairTasks = [];
     $scope.os = '';
 
+    $scope.showFakeNavbar = false;
+
     var alertParseError = function(error) {
       supersonic.ui.dialog.alert('Error: ' + error.code + ' ' + error.message);
     };
@@ -287,25 +289,16 @@ angular
       }
     };
 
-    var back = function() {
+    $scope.back = function() {
       reloadTrigger.trigger();
       supersonic.ui.layers.pop();
     };
 
-    var backButton = new supersonic.ui.NavigationBarButton({
-      title: 'Back',
-      onTap: back
+    supersonic.ui.navigationBar.hide().then(function() {
+      $scope.showFakeNavbar = true;
     });
 
-    supersonic.ui.navigationBar.update({
-      title: 'ToDo', //this is only while logo is blurry
-      overrideBackButton: true,
-      buttons: {
-        left: [backButton]
-      }
-    });
-
-    supersonic.device.buttons.back.whenPressed(back);
+    supersonic.device.buttons.back.whenPressed($scope.back);
 
     $scope.os = getMobileOperatingSystem();
 
