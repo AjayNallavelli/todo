@@ -45,3 +45,12 @@ html, body {
   padding: 5px;
   height: 45px;
 }
+
+.fake-navbar {
+  height: 45px;
+  background-color: #00B5FF !important;
+}
+
+.fake-navbar-button {
+  height: 45px;
+}

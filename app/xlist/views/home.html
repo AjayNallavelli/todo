@@ -1,10 +1,7 @@
 <div ng-controller="HomeController">
-  <super-navbar>
-    <super-navbar-title>ToDo</super-navbar-title>
-    <super-navbar-button side="right" ng-click="addGeoList()">
-      Add
-    </super-navbar-button>
-  </super-navbar>
+  <div class="fake-navbar" ng-show="showFakeNavbar">
+    <button class="fake-navbar-button fake-right-button" ng-click="addGeoList()">Add</button>
+  </div>
 
   <div ng-repeat="pair in pairs">
     <div class="item row">

@@ -7,6 +7,11 @@ angular
            slackbot, push, ParseObject) {
     $scope.pairs = [];
 
+    $scope.showFakeNavbar = false;
+    supersonic.ui.navigationBar.hide().then(function() {
+      $scope.showFakeNavbar = true;
+    });
+
     // Haversine formula for getting distance in miles.
     var getDistance = function(p1, p2) {
       var R = 6378137; // Earth’s mean radius in meter

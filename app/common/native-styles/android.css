@@ -4,9 +4,6 @@
  ***********************************************************/
 
 navigation-bar {
- /* background-image: url(icons/todo.png);
-  background-size: auto 50px;
-  background-repeat: no-repeat;*/
   background-color: #00B5FF;
   color: #ffffff;
   padding-left: 6px;
@@ -73,4 +70,8 @@ tab-bar-item#index {
 
 tab-bar-item#internet {
   background-image: url(icons/search.svg);
+}
+
+#title-button {
+  background-image: url(icons/todo.png);
 }

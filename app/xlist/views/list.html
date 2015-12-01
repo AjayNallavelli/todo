@@ -1,7 +1,7 @@
 <div ng-controller="ListController">
-  <super-navbar>
-    <super-navbar-title>ToDo</super-navbar-title>
-  </super-navbar>
+  <div class="fake-navbar" ng-show="showFakeNavbar">
+    <button class="fake-navbar-button fake-right-button" ng-click="back()">Back</button>
+  </div>
 
   <div class="card" ng-if="pairs.length != 0" ng-repeat="pair in pairs">
     <super-navigate location="xlist#location" data-params-id="{{ pair.geoList.data.id }}">
