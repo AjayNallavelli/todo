@@ -120,7 +120,7 @@ angular
             if (!dequeued.task.data.isNew()) {
               dequeued.task.delete().then(function() {
                 if (!dequeued.pair.tasks.length) {
-                  congratsAlert();
+                  congratsAlert('deleted');
                 }
               }, alertParseError);
             }
@@ -251,17 +251,25 @@ angular
       task.done = !task.done;
       task.save().then(function(results) {
         if (allTasksDone(pair)) {
-          congratsAlert();
+          congratsAlert('checked');
         }
       }, alertParseError);
     };
 
-    var congratsAlert = _.debounce(function() {
-      var options = {
-        message: 'You\'ve finished all of your tasks! ' +
-          'Would you like to clear your to-do list?',
-        buttonLabels: ['Yes', 'No']
-      };
+    var congratsAlert = _.debounce(function(how) {
+      if (how === 'deleted') {
+        var options = {
+          message: 'You\'ve finished all of your tasks! ',
+          buttonLabels: ['Hooray!']
+        };
+      }
+      else {
+        var options = {
+          message: 'You\'ve finished all of your tasks! ' +
+            'Would you like to clear your to-do list?',
+          buttonLabels: ['Yes', 'No']
+        };
+      }
       supersonic.ui.dialog.confirm('Congratulations!', options)
         .then(function(index) {
           console.log($scope.pairs[0].tasks.length);
