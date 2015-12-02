@@ -76,3 +76,17 @@ html, body {
   margin: 0 auto;
   padding: 10px;
 }
+
+.list-placeholder {
+  padding: 10px;
+}
+
+.list-placeholder h3 {
+  display: inline;
+  margin-left: 14px;
+}
+
+.list-placeholder i {
+  font-size: 30px;
+  float: left;
+}
