@@ -4,7 +4,7 @@
     <button class="fake-navbar-button fake-right-button" ng-click="addGeoList()">Add</button>
   </div>
 
-  <div ng-if="pairs.length != 0" ng-repeat="pair in pairs">
+  <div ng-repeat="pair in pairs">
     <div class="item row">
       <div class="col col-90">
         <super-navigate location="xlist#list" data-params-id="{{ pair.geoList.data.id }}">
@@ -20,7 +20,7 @@
       </div>
     </div>
   </div>
-  <div class="list-placeholder" ng-if="pairs.length == 0" ng-click="addGeoList()">
+  <div class="list-placeholder" ng-show="pairs.length === 0" ng-click="addGeoList()">
     <h3>Tap to add a list</h3>
     <i class="icon-right super-plus-circled"></i>
   </div>
