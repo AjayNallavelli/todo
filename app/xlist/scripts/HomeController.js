@@ -171,25 +171,11 @@ angular
             pair.incompleteTasks = (taskCount.incomplete || 0);
           });
         }).then(function() {
-          if (!newPairs.length) {
-            var defaultGeoList = new ParseObject(new GeoList(), GeoList.fields);
-            defaultGeoList.name = 'Grocery List';
-            defaultGeoList.uuid = device.uuid;
-            defaultGeoList.save().then(function() {
-              $scope.pairs.push({
-                geoList: defaultGeoList,
-                tasks: [],
-                completeTasks: 0,
-                incompleteTasks: 0
-              });
-            }).catch(alertParseError);
-          } else {
-            $scope.$apply(function($scope) {
-              $scope.pairs = _.sortBy(newPairs, function(pair) {
-                return pair.geoList.name.toLowerCase();
-              });
+          $scope.$apply(function($scope) {
+            $scope.pairs = _.sortBy(newPairs, function(pair) {
+              return pair.geoList.name.toLowerCase();
             });
-          }
+          });
         });
       });
     };
