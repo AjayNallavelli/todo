@@ -257,14 +257,14 @@ angular
     };
 
     var congratsAlert = _.debounce(function(how) {
+      var options = {};
       if (how === 'deleted') {
-        var options = {
+        options = {
           message: 'You\'ve finished all of your tasks! ',
           buttonLabels: ['Hooray!']
         };
-      }
-      else {
-        var options = {
+      } else {
+        options = {
           message: 'You\'ve finished all of your tasks! ' +
             'Would you like to clear your to-do list?',
           buttonLabels: ['Yes', 'No']
