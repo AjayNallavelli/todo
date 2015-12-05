@@ -2,9 +2,9 @@ angular
   .module('xlist')
   .controller('HomeController',
       ['$scope', '$q', 'supersonic', 'GeoList', 'Task', 'locationService',
-       'deviceReady', 'reloadTrigger', 'slackbot', 'push', 'ParseObject',
+       'deviceReady', 'reloadTrigger', 'push', 'ParseObject',
   function($scope, $q, supersonic, GeoList, Task, locationService, deviceReady,
-           reloadTrigger, slackbot, push, ParseObject) {
+           reloadTrigger, push, ParseObject) {
     $scope.pairs = [];
 
     $scope.showFakeNavbar = false;
@@ -120,7 +120,6 @@ angular
             title: 'ToDo',
             message: message
           });
-          slackbot('ToDo: ' + message);
         }
       }
     };
