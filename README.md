@@ -7,7 +7,7 @@ you to complete list items.
 
 ## Limitations
 
-While ToDo can be deployed for both Android and iOS. At this time, push
+While ToDo can be deployed for both Android and iOS, at this time push
 notifications and geolocation while in the background only work on Android.
 
 ## Development Setup
