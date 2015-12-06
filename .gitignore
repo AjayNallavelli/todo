@@ -98,3 +98,4 @@ bower_components
 
 # Key files
 app/xlist/index.js
+parse/cloud/main.js
