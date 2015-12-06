@@ -6,7 +6,7 @@ Parse.Cloud.define('sendPN', function(request, response) {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': 'key=' + 'AIzaSyCemcoo2AOx8eeyo8jvr2TEmRnOiZUlFOs'
+      'Authorization': 'key=' + 'INSERT ANDROID GCM KEY HERE'
     }
   }).then(response.success, response.error);
 });
