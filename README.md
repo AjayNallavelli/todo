@@ -56,6 +56,8 @@ sources and possibly uninstall any other instances of the AppGyver Scanner.
 
 You can now use the custom AppGyver Scanner to develop ToDo on Android.
 
+Install the APP on your IOS device, You will follow [Build setting for IOS](http://docs.appgyver.com/tooling/build-service/build-settings/build-settings-for-ios/) to generate the certificate file and provisioning profile file. When you have the `.mobileprovision` and `.p12` files, you can build your `IPA` by [Deploying your app to the cloud](http://docs.appgyver.com/tooling/build-service/build-settings/deploying-to-cloud/).
+
 ## Distribution
 
 When ready to distribute ToDo, run
