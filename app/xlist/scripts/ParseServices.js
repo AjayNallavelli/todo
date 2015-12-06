@@ -1,10 +1,12 @@
+// SOURCED FROM: https://github.com/jbroquist/parse-angular
 /* jscs:disable */
 /* jshint ignore:start */
 angular.module('ParseServices', [])
 
 .factory('ParseSDK', function(){
 	//initialize parse
-  	Parse.initialize("VDhhLoxsxxX6XIxMfTr66guz1bzzZ3kr9p40wxbI", "ytT40Ghe8DFaUQ5Ni7fx7Az90VxNGXFFdjjdl2eF");
+  	Parse.initialize('VDhhLoxsxxX6XIxMfTr66guz1bzzZ3kr9p40wxbI',
+      'ytT40Ghe8DFaUQ5Ni7fx7Az90VxNGXFFdjjdl2eF');
 })
 
 .factory('ParseQuery', ['$q', '$rootScope', function ($q, $rootScope){
