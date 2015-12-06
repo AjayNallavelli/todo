@@ -1,14 +1,9 @@
 # ToDo - do more today
 
-## Synopsis
+## Summary
 
 ToDo is a mobile to-do list app that, when near a specified location, reminds
 you to complete list items.
-
-## Limitations
-
-While ToDo can be deployed for both Android and iOS, at this time push
-notifications and geolocation while in the background only work on Android.
 
 ## Development Setup
 
@@ -94,6 +89,13 @@ You can get the gcm registration id by running
 ```
 
 in Android app's WebView.
+
+## Limitations
+
+- While ToDo can be deployed for both Android and iOS, at this time, push
+notifications and background geolocation only work on Android.
+- For Android versions 5.0+, the icon for push notifications does not appear
+correctly. This can be corrected by making the white part transparent.
 
 ## License
 
