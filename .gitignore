@@ -95,3 +95,6 @@ bower_components
 # Cloud files
 # config/cloud.json
 # config/cloud-resources.raml
+
+# Key files
+app/xlist/index.js
