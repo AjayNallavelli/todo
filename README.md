@@ -5,11 +5,78 @@
 ToDo is a mobile to-do list app that, when near a specified location, reminds
 you to complete list items.
 
+## Limitations
+
+While ToDo can be deployed for both Android and iOS. At this time, push
+notifications and geolocation while in the background only work on Android.
+
 ## Development Setup
 
-https://github.com/katzer/cordova-plugin-background-mode.git
+Install Steroids and other development dependencies according to the
+[Steroids install wizard](https://academy.appgyver.com/installwizard/).
 
-## Deploying
+Install the npm and bower dependencies with
+
+```
+$ steroids update
+```
+
+You are now ready to run `steroids connect` and start developing.
+
+## Parse Setup
+
+## Custom AppGyver Scanner
+
+Geolocation while in the background on Android requires an Apache Cordova plugin
+which the Play Store [AppGyver Scanner](https://play.google.com/store/apps/details?id=com.appgyver.freshandroid)
+does not include.
+
+To build a custom AppGyver Scanner with the plugin, run
+
+```
+steroids deploy
+```
+
+You can now find your app on the
+[AppGyver Cloud Services](https://cloud.appgyver.com/applications) page.
+
+Configure the Android Scanner Build according to the
+[Build Service Documentation](http://docs.appgyver.com/tooling/build-service/).
+Enable push notifications. Add
+
+```
+{"source":"<https://github.com/katzer/cordova-plugin-background-mode.git>"}
+```
+
+to the plugin configuration JSON array. Enable location permissions.
+
+You are now ready to build your custom AppGyver Scanner. Select Platform Webview
+Scanner from the build menu. You will receive an email with a link to an `.apk`
+file when the build finishes.
+
+Install the `.apk` file on your Android device. You will need to enable unknown
+sources and possibly uninstall any other instances of the AppGyver Scanner.
+
+You can now use the custom AppGyver Scanner to develop ToDo on Android.
+
+## Distribution
+
+When ready to distribute ToDo, run
+
+```
+steroids deploy
+```
+
+Find your app on the
+[AppGyver Cloud Services](https://cloud.appgyver.com/applications) page and
+configure the Android Google Play Build according to the
+[Build Service Documentation](http://docs.appgyver.com/tooling/build-service/).
+
+You are now ready to build your custom AppGyver Scanner. Select Platform Webview
+Google Play from the build menu. You will receive an email with a link to an
+`.apk` file when the build finishes.
+
+## Utilities
 
 ## License
 
