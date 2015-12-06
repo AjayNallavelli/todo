@@ -25,6 +25,8 @@ You are now ready to run `steroids connect` and start developing.
 
 ## Parse Setup
 
+## Push Notification Setup
+
 ## Custom AppGyver Scanner
 
 Geolocation while in the background on Android requires an Apache Cordova plugin
@@ -45,7 +47,7 @@ Configure the Android Scanner Build according to the
 Enable push notifications. Add
 
 ```
-{"source":"<https://github.com/katzer/cordova-plugin-background-mode.git>"}
+{"source":"https://github.com/katzer/cordova-plugin-background-mode.git"}
 ```
 
 to the plugin configuration JSON array. Enable location permissions.
@@ -75,6 +77,23 @@ build menu. You will receive an email with a link to an `.apk` file when the
 build finishes.
 
 ## Utilities
+
+```
+$ node scripts/push.js <device uuid> <gcm registration id>
+```
+
+Running this command sends a push notification to an Android device based on the
+data in one arbitrary list associated with the device uuid.
+
+You can get the gcm registration id by running
+
+```
+> window.plugins.pushNotification.register({
+    senderID: '<gcm sender id>'
+  }).then(function(registrationID) { ... });
+```
+
+in Android app's WebView.
 
 ## License
 
