@@ -69,12 +69,10 @@ steroids deploy
 
 Find your app on the
 [AppGyver Cloud Services](https://cloud.appgyver.com/applications) page and
-configure the Android Google Play Build according to the
-[Build Service Documentation](http://docs.appgyver.com/tooling/build-service/).
-
-You are now ready to build your custom AppGyver Scanner. Select Platform Webview
-Google Play from the build menu. You will receive an email with a link to an
-`.apk` file when the build finishes.
+configure the Android Google Play Build (make sure the plugin and permissions
+configuration from above is done). Select Platform Webview Google Play from the
+build menu. You will receive an email with a link to an `.apk` file when the
+build finishes.
 
 ## Utilities
 
