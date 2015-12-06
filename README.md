@@ -18,9 +18,11 @@ $ steroids update
 
 You are now ready to run `steroids connect` and start developing.
 
-## Parse Setup
-
 ## Push Notification Setup
+
+## Google Maps API Key
+
+Create a [Google Maps JavaScript API key](https://developers.google.com/maps/documentation/javascript/). Once you have your key, add it to index.js where it says to insert your key.
 
 ## Custom AppGyver Scanner
 
