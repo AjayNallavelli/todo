@@ -18,11 +18,86 @@ $ steroids update
 
 You are now ready to run `steroids connect` and start developing.
 
+## Parse Setup
+
+ToDo uses [Parse](https://parse.com) as a backend.
+
+First create an app on <Parse.com> and obtain the application id and javascript
+api key. Complete the following code in `app/common/views/layout.html` and
+`scripts/push.js`.
+
+```
+Parse.intitalize('<application id>', '<javascript api key>');
+```
+
+You will need to add two classes, `GeoList` and `Task` to the schema.
+
+### GeoList
+
+```
+{
+  "address": "30 W Huron St, Chicago, IL 60654",
+  "createdAt": "2015-11-25T23:48:36.836Z",
+  "location": {
+    "__type": "GeoPoint",
+    "latitude": 41.8951139,
+    "longitude": -87.62924900000002
+  },
+  "name": "Grocery List",
+  "objectId": "N83IUHKhJw",
+  "storeName": "Whole Foods Market",
+  "updatedAt": "2015-11-25T23:50:15.308Z",
+  "uuid": "35808D90-4DE5-4294-A741-6A457EB91EF2"
+}
+```
+
+### Task
+
+```
+{
+  "createdAt": "2015-11-18T23:34:47.172Z",
+  "done": false,
+  "geoList": {
+    "__type": "Pointer",
+    "className": "GeoList",
+    "objectId": "N83IUHKhJw"
+  },
+  "name": "Milk",
+  "objectId": "695mbwIf1G",
+  "updatedAt": "2015-11-18T23:34:47.172Z"
+}
+```
+
 ## Push Notification Setup
+
+First, set up Parse Cloud Code.
+
+```
+$ cd parse
+$ parse new
+```
+
+Follow the instructions to connect your Parse app. Make sure to use `cloud` as
+the directory name.
+
+Now set up
+[Google Cloud Messaging](https://developers.google.com/cloud-messaging/) and
+obtain the sender id and api key.
+
+Fill in `gcmSenderId` in `app/xlist/index.js` and `gcmApiKey` in
+`parse/cloud/main.js`. Finally, run
+
+```
+$ parse deploy
+```
+
+The cloud code will be deployed to Parse. By executing this code via the Parse
+API, ToDo sends push notifications.
 
 ## Google Maps API Key
 
-Create a [Google Maps JavaScript API key](https://developers.google.com/maps/documentation/javascript/). Once you have your key, add it to index.js where it says to insert your key.
+Obtain a [Google Maps JavaScript API key](https://developers.google.com/maps/documentation/javascript/).
+Once you have your key, fill in `googleMapsApiKey` in `app/xlist/index.js`.
 
 ## Custom AppGyver Scanner
 
@@ -57,8 +132,6 @@ Install the `.apk` file on your Android device. You will need to enable unknown
 sources and possibly uninstall any other instances of the AppGyver Scanner.
 
 You can now use the custom AppGyver Scanner to develop ToDo on Android.
-
-Install the APP on your IOS device, You will follow [Build setting for IOS](http://docs.appgyver.com/tooling/build-service/build-settings/build-settings-for-ios/) to generate the certificate file and provisioning profile file. When you have the `.mobileprovision` and `.p12` files, you can build your `IPA` by [Deploying your app to the cloud](http://docs.appgyver.com/tooling/build-service/build-settings/deploying-to-cloud/).
 
 ## Distribution
 

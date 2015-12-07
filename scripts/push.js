@@ -1,9 +1,7 @@
 var Parse = require('parse/node').Parse;
 var _ = require('underscore');
 
-Parse.initialize(
-    'VDhhLoxsxxX6XIxMfTr66guz1bzzZ3kr9p40wxbI',
-    'ytT40Ghe8DFaUQ5Ni7fx7Az90VxNGXFFdjjdl2eF');
+Parse.initialize('', '');
 
 var GeoList = Parse.Object.extend('GeoList');
 var Task = Parse.Object.extend('Task');

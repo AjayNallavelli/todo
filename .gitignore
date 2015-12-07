@@ -93,9 +93,9 @@ bower_components
 *.sublime-workspace
 
 # Cloud files
-# config/cloud.json
-# config/cloud-resources.raml
+config/cloud.json
+config/cloud-resources.raml
 
-# Key files
-app/xlist/index.js
-parse/cloud/main.js
+# Parse
+.parse.local
+.parse.project
