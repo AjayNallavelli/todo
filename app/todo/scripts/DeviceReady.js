@@ -1,5 +1,5 @@
 angular
-  .module('xlist')
+  .module('todo')
   .factory('deviceReady', ['$q', function($q) {
     var deviceReady = false;
     document.addEventListener('deviceready', function() {

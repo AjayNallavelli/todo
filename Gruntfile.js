@@ -16,7 +16,7 @@ module.exports = function(grunt) {
         verbose: true
       },
       src: [
-        'app/xlist/**/*.js',
+        'app/todo/**/*.js',
         'scripts/**/*.js',
         'parse/**/*.js',
         'Gruntfile.js',
@@ -28,7 +28,7 @@ module.exports = function(grunt) {
         jshintrc: '.jshintrc'
       },
       src: [
-        'app/xlist/**/*.js',
+        'app/todo/**/*.js',
         'scripts/**/*.js',
         'parse/**/*.js',
         'Gruntfile.js',

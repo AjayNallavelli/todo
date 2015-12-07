@@ -1,7 +1,7 @@
 angular
-  .module('xlist')
+  .module('todo')
   .factory('push',
-      ['$http', '$q', 'supersonic', 'deviceReady', 'gcmSenderId'
+      ['$http', '$q', 'supersonic', 'deviceReady', 'gcmSenderId',
        function($http, $q, supersonic, deviceReady, gcmSenderId) {
     var registrationID = null;
     var afterRegistration = function() {

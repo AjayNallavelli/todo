@@ -1,5 +1,5 @@
 angular
-  .module('xlist')
+  .module('todo')
   .constant('Task', _.extend(
       Parse.Object.extend('Task'),
       {fields: ['name', 'done', 'geoList']}))

@@ -22,9 +22,9 @@ You are now ready to run `steroids connect` and start developing.
 
 ToDo uses [Parse](https://parse.com) as a backend.
 
-First create an app on <Parse.com> and obtain the application id and javascript
-api key. Complete the following code in `app/common/views/layout.html` and
-`scripts/push.js`.
+First create an app on [Parse.com](https://parse.com) and obtain the application id and javascript
+api key. Update the following code in `app/common/views/layout.html` and
+`app/todo/scripts/ParseServices.js`.
 
 ```
 Parse.intitalize('<application id>', '<javascript api key>');
@@ -84,7 +84,7 @@ Now set up
 [Google Cloud Messaging](https://developers.google.com/cloud-messaging/) and
 obtain the sender id and api key.
 
-Fill in `gcmSenderId` in `app/xlist/index.js` and `gcmApiKey` in
+Fill in `gcmSenderId` in `app/todo/index.js` and `gcmApiKey` in
 `parse/cloud/main.js`. Finally, run
 
 ```
@@ -97,7 +97,7 @@ API, ToDo sends push notifications.
 ## Google Maps API Key
 
 Obtain a [Google Maps JavaScript API key](https://developers.google.com/maps/documentation/javascript/).
-Once you have your key, fill in `googleMapsApiKey` in `app/xlist/index.js`.
+Once you have your key, fill in your key in `app/todo/index.js`.
 
 ## Custom AppGyver Scanner
 

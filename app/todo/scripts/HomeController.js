@@ -1,5 +1,5 @@
 angular
-  .module('xlist')
+  .module('todo')
   .controller('HomeController',
       ['$scope', '$q', 'supersonic', 'GeoList', 'Task', 'locationService',
        'deviceReady', 'reloadTrigger', 'push', 'ParseObject',
@@ -68,7 +68,7 @@ angular
               completeTasks: 0,
               incompleteTasks: 0
             });
-            var locationView = new supersonic.ui.View('xlist#location');
+            var locationView = new supersonic.ui.View('todo#location');
             supersonic.ui.layers.push(locationView, {
               params: {
                 id: newGeoList.data.id

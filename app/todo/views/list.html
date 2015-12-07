@@ -4,7 +4,7 @@
     <button class="fake-navbar-button fake-left-button icon-left super-ios-arrow-back" ng-click="back()">&nbsp;Back</button>
   </div>
   <div class="card" ng-if="pairs.length != 0" ng-repeat="pair in pairs">
-    <super-navigate location="xlist#location" data-params-id="{{ pair.geoList.data.id }}">
+    <super-navigate location="todo#location" data-params-id="{{ pair.geoList.data.id }}">
       <div class="item item-divider">
         <div class="row">
           <div class="col col-90">

@@ -1,5 +1,5 @@
 angular
-  .module('xlist', [
+  .module('todo', [
     // Declare here all AngularJS dependencies that are shared by the example module.
     'ParseServices',
     'supersonic',
@@ -10,7 +10,8 @@ angular
   .config(['uiGmapGoogleMapApiProvider', 'googleMapsApiKey',
       function(uiGmapGoogleMapApiProvider, googleMapsApiKey) {
         uiGmapGoogleMapApiProvider.configure({
-          key: googleMapsApiKey,
+          // YOUR API KEY GOES HERE
+          key: 'your_api_key',
           v: '3.20', //defaults to latest 3.X anyhow
           libraries: 'places'
         });

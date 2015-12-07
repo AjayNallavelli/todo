@@ -5,8 +5,10 @@ angular.module('ParseServices', [])
 
 .factory('ParseSDK', function(){
 	//initialize parse
-  	Parse.initialize('VDhhLoxsxxX6XIxMfTr66guz1bzzZ3kr9p40wxbI',
-      'ytT40Ghe8DFaUQ5Ni7fx7Az90VxNGXFFdjjdl2eF');
+
+  // YOUR API KEYS GO HERE
+  	Parse.initialize('application_id',
+      'javascript_api_key');
 })
 
 .factory('ParseQuery', ['$q', '$rootScope', function ($q, $rootScope){

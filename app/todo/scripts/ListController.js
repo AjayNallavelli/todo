@@ -1,5 +1,5 @@
 angular
-  .module('xlist')
+  .module('todo')
   .controller('ListController',
       ['$scope', '$q', 'supersonic', 'reloadTrigger', 'GeoList', 'Task',
        'ParseObject',

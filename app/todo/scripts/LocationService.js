@@ -1,5 +1,5 @@
 angular
-  .module('xlist')
+  .module('todo')
   .factory('locationService',
       ['$q', 'supersonic', 'deviceReady',
   function($q, supersonic, deviceReady) {

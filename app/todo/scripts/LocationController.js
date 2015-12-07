@@ -1,5 +1,5 @@
 angular
-  .module('xlist')
+  .module('todo')
   .controller('LocationController',
       ['$scope', 'supersonic', 'locationService', 'reloadTrigger', 'GeoList',
        'uiGmapGoogleMapApi',

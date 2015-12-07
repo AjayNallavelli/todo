@@ -1,5 +1,5 @@
 angular
-  .module('xlist')
+  .module('todo')
   .factory('reloadTrigger', ['supersonic', function(supersonic) {
     var reloadTrigger = {};
     var channel = supersonic.data.channel('reload');
