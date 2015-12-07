@@ -1,8 +1,8 @@
 angular
   .module('xlist')
   .factory('push',
-      ['$http', '$q', 'supersonic', 'deviceReady',
-       function($http, $q, supersonic, deviceReady) {
+      ['$http', '$q', 'supersonic', 'deviceReady', 'gcmSenderId'
+       function($http, $q, supersonic, deviceReady, gcmSenderId) {
     var registrationID = null;
     var afterRegistration = function() {
       var deferred = $q.defer();
@@ -16,7 +16,7 @@ angular
                 registrationID = newRegistrationID;
                 deferred.resolve(registrationID);
               }, deferred.reject, {
-                senderID: '1042561844220'
+                senderID: gcmSenderId
               });
         });
       }
